@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salade</title>
+</head>
+<body>
+
+    <div class="player_list">
+        <div id="player_template" hidden>
+            <select id="player_select">
+            </select>
+            <select id="player_role">
+            </select>
+            <input type="text" id="player_elo">
+        </div>
+    </div>
+
+    <div class="radio_container">
+        <div class="radio-group">
+            <p>Type de tournoi salade</p>
+            <input type="radio" id="classic" name="type" value="classic" checked>
+            <label for="classic">Classic</label>
+
+            <input type="radio" id="salad100" name="type" value="salad100">
+            <label for="salad100">Format 100</label>
+        </div>
+        <div class="radio-group">
+            <input type="radio" id="original_elo" name="elo" value="original_elo" checked>
+            <label for="original_elo">Elo original</label>
+            <input type="radio" id="salad_elo" name="elo" value="salad_elo">
+            <label for="salad_elo">Elo salade</label>
+        </div>    
+    </div>
+    <button id="add_random_players">
+        Ajouter des joueurs aléatoires
+    </button>
+
+
+</body>
+</html>
