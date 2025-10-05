@@ -19,4 +19,13 @@
  * @property {boolean} isActive
 */
 
-export {};
+/**
+ * @typedef {Object} PlayerHistory
+ * @property {Player} player
+ * @property {number} wins
+ */
+/**
+ * @typedef {Object} WinHistory
+ * @property {Array<PlayerHistory>}  
+ */
+export { };

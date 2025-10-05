@@ -7,6 +7,11 @@ import * as Types from './types.js';
 export const matchHistory = sessionStorage.getItem('matchHistory') ? JSON.parse(sessionStorage.getItem('matchHistory')) : [];
 
 /**
+ * @type {Array<Types.WinHistory>}
+ */
+export const winHistory = sessionStorage.getItem('winHistory') ? JSON.parse(sessionStorage.getItem('winHistory')) : [];
+
+/**
  * call this when "randomizer" button is clicked
  * @param {Array<Types.Player>} players
  * @param {"salad100" | "swiss"} mode 
@@ -31,3 +36,16 @@ export function setPlayers(players, mode) {
     
 }
 
+/**
+ * 
+ * @param {Types.Match} match 
+ * @param {Types.Team} winningTeam 
+ */
+export function setWinner(match, winningTeam) {
+    const winEntry = {
+        match,
+        winningTeam
+    };
+    winHistory.push(winEntry);
+    sessionStorage.setItem('winHistory', JSON.stringify(winHistory));
+}
