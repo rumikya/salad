@@ -1,46 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salade</title>
     <script type="module" src="index.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <input type="file" id="file_input" style="display:none" accept=".txt,.csv" />
-    <button id="import_button">Importer une database</button>
+    <div class="main">
+        <img id="background" src="assets/images/backgrounds/_bg1.png" alt="background">
+        <input type="file" id="file_input" style="display: none" accept=".txt,.csv" />
+        <div class="left_side">
+            <button id="import_button">Importer une database</button>
+            <button id="generate_button">Exporter la database</button>
+            <div id="player_list"></div>
+            <p class="player_count">
+                Nombre de joueurs: <span id="player_count_value">0</span>
+            </p>
+        </div>
+        <div class="right_side">
+            <div class="top_side">
+                <div class="radio_container">
+                    <div class="radio-group">
+                        <p>Type de tournoi salade:</p>
+                        <input type="radio" id="classic" name="type" value="classic" checked>
+                        <label for="classic">Classic</label>
+                        <input type="radio" id="salad100" name="type" value="salad100">
+                        <label for="salad100">Format 100</label>
+                    </div>
+                    <div class="radio-group">
+                        <p>Type de classement:</p>
+                        <input type="radio" id="original_elo" name="elo" value="original_elo" checked>
+                        <label for="original_elo">Elo original</label>
+                        <input type="radio" id="salad_elo" name="elo" value="salad_elo">
+                        <label for="salad_elo">Elo salade</label>
+                    </div>
+                </div>
+                <button id="add_random_players">
+                    Ajouter des joueurs aléatoires
+                </button>
+            </div>
 
-    
-    <div class="player_list">
-        <div id="player_template" hidden>
-            <select id="player_select">
-            </select>
-            <select id="player_role">
-            </select>
-            <input type="text" id="player_elo">
+            <div class="bottom_side">
+                <div class="button_container">
+                    <div class="button_row">
+                        <div class="image_button" id="add_player_button">
+                            <img src="assets/images/buttons/_add_button.png" alt="" class="button_image">
+                        </div>
+                        <div class="image_button" id="remove_player_button">
+                            <img src="assets/images/buttons/_remove_button.png" alt="" class="button_image">
+                        </div>
+                    </div>
+                    <div class="button_row">
+                        <div class="image_button">
+                            <img src="assets/images/buttons/_to_database.png" alt="" class="button_image">
+                        </div>
+                        <div class="image_button">
+                            <img src="assets/images/buttons/_start_button.png" alt="" class="button_image">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="radio_container">
-        <div class="radio-group">
-            <p>Type de tournoi salade</p>
-            <input type="radio" id="classic" name="type" value="classic" checked>
-            <label for="classic">Classic</label>
 
-            <input type="radio" id="salad100" name="type" value="salad100">
-            <label for="salad100">Format 100</label>
-        </div>
-        <div class="radio-group">
-            <input type="radio" id="original_elo" name="elo" value="original_elo" checked>
-            <label for="original_elo">Elo original</label>
-            <input type="radio" id="salad_elo" name="elo" value="salad_elo">
-            <label for="salad_elo">Elo salade</label>
-        </div>    
+
+    <div id="player_template" hidden>
+        <select id="player_select"></select>
+        <select id="player_role"></select>
+        <img id="player_rank_img" width="32" height="32">
     </div>
-    <button id="add_random_players">
-        Ajouter des joueurs aléatoires
-    </button>
-
-
 </body>
+
 </html>
