@@ -9,10 +9,7 @@ const RanksString = [ "rookie" , "iron" , "bronze" , "silver" , "gold" , "platin
 const Roles = [ "Guardian", "Forward", "Flex"]
 
 /** @type {Array<Types.Player>} */
-const playerCache = localStorage.getItem('playerCache') ? JSON.parse(localStorage.getItem('playerCache')) : [];
-
-
-
+const playerCache = sessionStorage.getItem('playerCache') ? JSON.parse(sessionStorage.getItem('playerCache')) : [];
 
 /**
  * 
