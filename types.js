@@ -14,7 +14,7 @@
  * 
  * @typedef {Object} Player
  * @property {string} name
- * @property {Ranks} rank
+ * @property {number} rank
  * @property {Roles} role
  * @property {boolean} isActive
 */
