@@ -1,4 +1,5 @@
 import { getPairings } from './salad100.js';
+import { generateTeams, generateMatches } from './swiss.js';
 // this is the only file that the front-end should import from
 
 /**
@@ -14,4 +15,11 @@ export function getSalad100Round() {
  */
 export function rerollSalad100Round() {
     return getPairings(true);
+}
+
+export function generateSwissTeams() {
+    return generateTeams(models.playerCache);
+}
+export function generateSwissMatches(teams) {
+    return generateMatches(teams);
 }
