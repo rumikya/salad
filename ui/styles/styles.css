@@ -97,6 +97,7 @@ button:hover {
 .image_button {
     background: white;
     border: 1px solid black;
+    padding: 0;
 } 
 
 .image_button:hover {
@@ -141,3 +142,26 @@ button:hover {
     height: 30px;
     border-radius: 5px;
 }
+
+.backdrop {
+    background-color: #000000cc;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+}
+
+.modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+

@@ -1,4 +1,4 @@
-import * as Types from '../types/index.js';
+import * as Types from '../types.js';
 import { matchHistory } from '../caches.js';
 import { getTeamRank, getAllUniqueTeams } from './utils.js';
 

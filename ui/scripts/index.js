@@ -1,4 +1,4 @@
-import {eloToRank} from "./models.js";
+import {eloToRank} from "../../models.js";
 // name,role,elo,win,participation,salad_elo
 let players = [];
 let eloMode = "salad_elo"; // or elo
@@ -6,11 +6,13 @@ let eloMode = "salad_elo"; // or elo
 document.addEventListener("DOMContentLoaded", function() {
     localStorage.getItem('databaseCache') ? players = JSON.parse(localStorage.getItem('databaseCache')) : players = [];
     const savedPlayers = sessionStorage.getItem('playersList') ? JSON.parse(sessionStorage.getItem('playersList')) : [];
-    console.log(sessionStorage.getItem('playersList'))
     savedPlayers.forEach(player => createPlayerEntry(player));
     eloMode = sessionStorage.getItem('eloMode') || "salad_elo";
 
     document.querySelector(`input[name="elo"][value="${eloMode}"]`).checked = true;
+
+    const backgroundChoices = Array.from({length: 7}, (_, i) => `bg${i + 1}.png`);
+    background.src = `assets/images/backgrounds/${backgroundChoices[Math.floor(Math.random() * backgroundChoices.length)]}`;
 });
 
 file_input.addEventListener("change", handleFileSelect);
@@ -65,7 +67,7 @@ remove_player_button.addEventListener("click", function() {
     if (entries.length > 0) {
         entries[entries.length - 1].remove();
         setPlayerSelects();
-        player_count_value.textContent = document.querySelectorAll(".player_entry").length;
+        setPlayerCount();
     }
 })
 
@@ -81,8 +83,12 @@ add_random_players.addEventListener("click", function() {
 
 
 function createPlayerEntry(player = {name: "", role: "Flex"}) {
+    /**
+     * @type {HTMLTemplateElement}
+     */
     const template = document.getElementById("player_template");
-    const entry = template.cloneNode(true);
+    const importedNode = document.importNode(template.content, true);
+    const entry = importedNode.firstElementChild;
     
     entry.id = "";
     entry.hidden = false;
@@ -113,18 +119,17 @@ function createPlayerEntry(player = {name: "", role: "Flex"}) {
         select.value = player.name;
         setPlayerRoles(node);
         roleSelect.value = player.role;
-        console.log(roleSelect.value)
         
         playerRoleChanged(node);
-    
+        setPlayerCount();
         return;
     }
 
     player_list.appendChild(entry);
 
-    player_count_value.textContent = document.querySelectorAll(".player_entry").length;
     updatePlayerList();
     setPlayerSelects();
+    setPlayerCount();
 }
 
 function playerNameChanged(entry) {
@@ -184,9 +189,12 @@ function playerRoleChanged(entry) {
     const rankImg = entry.querySelector("#player_rank_img");
 
     const playerName = select.value;
-    let playerElo = players.find(p => p.name === playerName && p.role === roleSelect.value)?.elo || 1000;
+    let playerElo;
     if(eloMode == "salad_elo") {
         playerElo = players.find(p => p.name === playerName && p.role === roleSelect.value)?.salad_elo || 1000;
+    }
+    else {
+        playerElo = players.find(p => p.name === playerName && p.role === roleSelect.value)?.elo || 1000;
     }
     const playerEloValue = eloToRank(playerElo);
     rankImg.src = `assets/images/ranks/${playerEloValue}.png`;
@@ -215,3 +223,15 @@ document.getElementsByName("elo").forEach(radio => {
     });
 });
 
+function setPlayerCount() {
+    player_count_value.textContent = document.querySelectorAll(".player_entry").length;
+}
+
+
+start_button.addEventListener("click", function() {
+
+})
+
+to_database_button.addEventListener("click", function() {
+    window.location.href = "database.html";
+});

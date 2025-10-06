@@ -5,11 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salade</title>
-    <script type="module" src="index.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="ui/scripts/index.js" defer></script>
+    <link rel="stylesheet" href="ui/styles/styles.css">
 </head>
 
 <body>
+
     <div class="main">
         <img id="background" src="assets/images/backgrounds/bg1.png" alt="background">
         <input type="file" id="file_input" style="display: none" accept=".txt,.csv" />
@@ -47,20 +48,20 @@
             <div class="bottom_side">
                 <div class="button_container">
                     <div class="button_row">
-                        <div class="image_button" id="add_player_button">
+                        <button class="image_button" id="add_player_button">
                             <img src="assets/images/buttons/add_button.png" alt="" class="button_image">
-                        </div>
-                        <div class="image_button" id="remove_player_button">
+                        </button>
+                        <button class="image_button" id="remove_player_button">
                             <img src="assets/images/buttons/remove_button.png" alt="" class="button_image">
-                        </div>
+                        </button>
                     </div>
                     <div class="button_row">
-                        <div class="image_button">
+                        <button class="image_button" id="to_database_button">
                             <img src="assets/images/buttons/to_database.png" alt="" class="button_image">
-                        </div>
-                        <div class="image_button">
+                        </button>
+                        <button class="image_button" id="start_button">
                             <img src="assets/images/buttons/start_button.png" alt="" class="button_image">
-                        </div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -68,12 +69,13 @@
     </div>
 
 
-
-    <div id="player_template" hidden>
-        <select id="player_select"></select>
-        <select id="player_role"></select>
-        <img id="player_rank_img" width="32" height="32">
-    </div>
+    <template id="player_template">
+        <div class="player_entry" hidden>
+            <select id="player_select"></select>
+            <select id="player_role"></select>
+            <img id="player_rank_img" width="32" height="32">
+        </div>
+    </template>
 </body>
 
 </html>

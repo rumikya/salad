@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salad database</title>
+    <script type="module" src="ui/scripts/database.js" defer></script>
+    <link rel="stylesheet" href="ui/styles/database.css">
+</head>
+
+<body>
+    <footer>
+        <p>Made out of spite by <a href="https://github.com/yourusername">Your Name</a></p>
+    </footer>
+    <img id="background" src="assets/images/backgrounds/bg1.png" alt="background">
+    <div class="main">
+        <div class="table-container">
+            <div class="table-content-container">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player Name</th>
+                            <th>Role</th>
+                            <th>Original Elo</th>
+                            <th>Salad Elo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="database_table_body">
+                        <template id="player_template">
+                            <tr>
+                                <td class="player_name"></td>
+                                <td class="player_role"></td>
+                                <td class="original_elo"></td>
+                                <td class="salad_elo"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
