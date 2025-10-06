@@ -20,12 +20,11 @@
 */
 
 /**
- * @typedef {Object} PlayerHistory
- * @property {Player} player
- * @property {number} wins
+ * @typedef {Object} WinEntry
+ * @property {Match} match
+ * @property {Team} winner
  */
 /**
- * @typedef {Object} WinHistory
- * @property {Array<PlayerHistory>}  
+ * @typedef {Array<WinEntry>} WinHistory
  */
 export { };

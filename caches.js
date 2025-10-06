@@ -7,7 +7,7 @@ import * as Types from './types.js';
 export const matchHistory = sessionStorage.getItem('matchHistory') ? JSON.parse(sessionStorage.getItem('matchHistory')) : [];
 
 /**
- * @type {Array<Types.WinHistory>}
+ * @type {Types.WinHistory}
  */
 export const winHistory = sessionStorage.getItem('winHistory') ? JSON.parse(sessionStorage.getItem('winHistory')) : [];
 
@@ -33,7 +33,7 @@ export function setPlayers(players, mode) {
         return;
     }
     sessionStorage.setItem('playerCache', JSON.stringify(players));
-    
+
 }
 
 /**
@@ -48,4 +48,33 @@ export function setWinner(match, winningTeam) {
     };
     winHistory.push(winEntry);
     sessionStorage.setItem('winHistory', JSON.stringify(winHistory));
+}
+
+/**
+ * 
+ * @returns {Types.Player[]}
+ */
+export function getWinningPlayers() {
+    /**
+     * @type {{player:Types.Player, wins: number}[]}
+     */
+    const players = [];
+    /**
+     * @param {Types.Player} player
+     */
+    function addWin(player) {
+        let playerEntry = players.find(val => val.player.name == player.name);
+        if (!playerEntry) {
+            const idx = players.push({ player, wins: 0 })
+            playerEntry = players[idx-1]
+        }
+        playerEntry.wins++;
+    }
+
+    winHistory.forEach((win) => {
+        win.winner.players.forEach(addWin)
+    })
+    players.sort((a,b)=>a.wins-b.wins);
+    let maxWin = players[0];
+    return players.filter(player => player.wins == maxWin)
 }
