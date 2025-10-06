@@ -10,36 +10,57 @@
 </head>
 
 <body>
-    <footer>
-        <p>Made out of spite by <a href="https://github.com/yourusername">Your Name</a></p>
-    </footer>
+
     <img id="background" src="assets/images/backgrounds/bg1.png" alt="background">
     <div class="main">
         <div class="table-container">
             <div class="table-content-container">
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Player Name</th>
-                            <th>Role</th>
-                            <th>Original Elo</th>
-                            <th>Salad Elo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="database_table_body">
-                        <template id="player_template">
+                <div class="table-scroll">
+                    <table>
+                        <colgroup>
+                            <col class="col-1">
+                            <col class="col-2">
+                            <col class="col-3">
+                            <col class="col-4">
+                        </colgroup>
+                        <thead>
                             <tr>
-                                <td class="player_name"></td>
-                                <td class="player_role"></td>
-                                <td class="original_elo"></td>
-                                <td class="salad_elo"></td>
+                                <th>Player Name</th>
+                                <th>Role</th>
+                                <th>Original Elo</th>
+                                <th>Salad Elo</th>
                             </tr>
-                        </template>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="database_table_body">
+                            <template id="player_template">
+                                <tr class="player_entry">
+                                    <td class="player_name">  <input> </td>
+                                    <td class="player_role">  <select>
+                                        <option> Gardien </option>
+                                        <option> Attaquant </option>
+                                        <option> Remplaçant </option>
+                                    </select> </td>
+                                    <td class="original_elo"> <input> </td>
+                                    <td class="salad_elo">    <input> </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
+        <footer>
+            <div class="buttons">
+                <button id="add_player_button">Ajouter Joueur</button>
+                <button id="remove_player_button">Retirer Joueur</button>
+                <button id="edit_player_button">Sauvegarder</button>
+            </div>
+            <div class="spite">
+                <p>Made out of spite by <a href="https://onlyfans.com/darkfa">Your Name</a></p>
+            </div>
+        </footer>
     </div>
 
 </body>

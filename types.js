@@ -13,9 +13,9 @@
 /**
  * 
  * @typedef {Object} Player
- * @property {string} name
- * @property {number} rank
- * @property {Roles} role
+ * @property {string}  name
+ * @property {number}  rank
+ * @property {Roles}   role
  * @property {boolean} isActive
 */
 

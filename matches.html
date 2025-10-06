@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salade Matches</title>
+    <script type="module" src="ui/scripts/matches.js" defer></script>
+    <link rel="stylesheet" href="ui/styles/matches.css">
+</head>
+
+<body>
+    <img id="background" src="assets/images/backgrounds/bg1.png" alt="background">
+    <div id="team_list">
+
+        <template id="team_template">
+            <div class="team_container">
+                <img src="assets/images/teams/team1.png" alt="team background" class="team_background">
+                <div class="team_content">
+                    <p class="team_name">Equipe <span class="team_number">1</span> <span class="team_name"> Team
+                            Name</span></p>
+                    <p> Average rank: <span class="average_rank">1200 <img class="average_rank_icon"></span></p>
+                    <div class="player_list">
+                        <div class="player_entry">
+                            <p class="player_name">Player 1</p>
+                            <img class="player_rank">
+                        </div>
+                        <div class="player_entry">
+                            <p class="player_name">Player 2</p>
+                            <img class="player_rank">
+                        </div>
+                        <div class="player_entry">
+                            <p class="player_name">Player 3</p>
+                            <img class="player_rank">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</body>
+
+</html>

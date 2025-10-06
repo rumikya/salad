@@ -1,5 +1,5 @@
 import * as Types from '../types.js';
-import { getTeamRank, getAllUniqueTeams } from './utils.js';
+import { getAllUniqueTeams } from './utils.js';
 import { getTeamElo } from './utils.js';
 
 /**
@@ -13,7 +13,7 @@ export function generateTeams(players) {
     const avgRank = finalPlayers.reduce((acc, player) => acc + player.rank, 0) / finalPlayers.length;
     const teamsWithProximity = possibleTeams.map(team => ({
         team,
-        proximity: Math.abs(getTeamRank(team) - avgRank)
+        proximity: Math.abs(getTeamElo(team) - avgRank)
     }));
     teamsWithProximity.sort((a, b) => a.proximity - b.proximity);
     const selectedTeams = [];

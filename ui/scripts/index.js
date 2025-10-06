@@ -1,15 +1,19 @@
-import {eloToRank} from "../../models.js";
+import { setPlayers } from "../../caches.js";
+import { eloToRank, databaseRoleToRole } from "../../models.js";
 // name,role,elo,win,participation,salad_elo
 let players = [];
 let eloMode = "salad_elo"; // or elo
+let gameMode = "swiss";
 
 document.addEventListener("DOMContentLoaded", function() {
     localStorage.getItem('databaseCache') ? players = JSON.parse(localStorage.getItem('databaseCache')) : players = [];
     const savedPlayers = sessionStorage.getItem('playersList') ? JSON.parse(sessionStorage.getItem('playersList')) : [];
     savedPlayers.forEach(player => createPlayerEntry(player));
     eloMode = sessionStorage.getItem('eloMode') || "salad_elo";
+    gameMode = sessionStorage.getItem('gameMode') || "swiss";
 
     document.querySelector(`input[name="elo"][value="${eloMode}"]`).checked = true;
+    document.querySelector(`input[name="type"][value="${gameMode}"]`).checked = true;
 
     const backgroundChoices = Array.from({length: 7}, (_, i) => `bg${i + 1}.png`);
     background.src = `assets/images/backgrounds/${backgroundChoices[Math.floor(Math.random() * backgroundChoices.length)]}`;
@@ -223,13 +227,34 @@ document.getElementsByName("elo").forEach(radio => {
     });
 });
 
+document.getElementsByName("type").forEach(radio => {
+    radio.addEventListener("change", function() {
+        gameMode = this.value;
+        sessionStorage.setItem('gameMode', gameMode);
+        updatePlayerList();        
+    });
+});
+
 function setPlayerCount() {
     player_count_value.textContent = document.querySelectorAll(".player_entry").length;
 }
 
 
 start_button.addEventListener("click", function() {
+    let eloKey = "elo";
+    if(eloMode == "salad_elo") {
+        eloKey = "salad_elo";
+    }
 
+
+    setPlayers(JSON.parse(sessionStorage.getItem('playersList')).map(p => ({
+        name: p.name,
+        rank: p[eloKey],
+        role: databaseRoleToRole(p.role),
+        isActive: true
+    })), gameMode);
+
+    window.location.href = "matches.html";
 })
 
 to_database_button.addEventListener("click", function() {

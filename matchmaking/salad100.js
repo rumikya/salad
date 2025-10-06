@@ -1,6 +1,6 @@
 import * as Types from '../types.js';
 import { matchHistory } from '../caches.js';
-import { getTeamRank, getAllUniqueTeams } from './utils.js';
+import { getTeamElo, getAllUniqueTeams } from './utils.js';
 
 /**
  * this should be set once per page load
@@ -38,7 +38,7 @@ export function getPairing(availableTeams) {
     let bestMatchScore = Infinity;
     for (let i = 0; i < availableTeams.length; i++) {
         const teamB = availableTeams[i];
-        const score = matchSimilarityScore(teamA, teamB) + Math.abs(getTeamRank(teamA) - getTeamRank(teamB));
+        const score = matchSimilarityScore(teamA, teamB) + Math.abs(getTeamElo(teamA) - getTeamElo(teamB));
         if (score < bestMatchScore) {
             bestMatchScore = score;
             bestMatchIndex = i;

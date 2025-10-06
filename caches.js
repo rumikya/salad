@@ -1,4 +1,4 @@
-import * as models from 'models.js';
+import * as models from './models.js';
 import * as Types from './types.js';
 
 /**

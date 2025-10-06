@@ -1,10 +1,10 @@
-import * as Types from '../types/index.js';
+import * as Types from '../types.js';
 /**
  * 
  * @param {Types.Team} team 
  * @returns {number}
  */
-export function getTeamRank(team) {
+export function getTeamElo(team) {
     return team.reduce((acc, player) => acc + player.rank, 0) / team.length;
 }
 
