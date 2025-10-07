@@ -59,12 +59,25 @@ export function removeExtraPlayers(players) {
  */
 export function generateMatches(teams, rounds = 4) {
     const roundsArr = [];
-    let allCombinations = matchCombinations(teams);
-    for (let i = 0; i < rounds; i++) {
-        if (i < allCombinations.length) {
+    let allCombinations = matchPermutations(teams);
+
+    // Only use up to the maximum number of rounds or available combinations
+    const maxRounds = Math.min(rounds, allCombinations.length);
+
+    for (let i = 0; i < maxRounds; i++) {
+        const existingRounds = roundsArr.map(round =>
+            round.map(match => [match.teamA.name, match.teamB.name].sort().join('-')).sort().join('|')
+        );
+        let nextRound = allCombinations.find(round => {
+            const roundKey = round.map(match => [match.teamA.name, match.teamB.name].sort().join('-')).sort().join('|');
+            return !existingRounds.includes(roundKey);
+        });
+        if (nextRound) {
+            roundsArr.push(nextRound);
+            allCombinations = allCombinations.filter(r => r !== nextRound);
+        } else if (i < allCombinations.length) {
             roundsArr.push(allCombinations[i]);
-        }
-        else {
+        } else if (allCombinations.length > 0) {
             const idx = Math.floor(Math.random() * allCombinations.length);
             const randomRound = allCombinations[idx];
             roundsArr.push(randomRound);
@@ -78,38 +91,24 @@ export function generateMatches(teams, rounds = 4) {
  * @param {Array<Types.Team>} teams
  * @returns {Array<Array<Types.Match>>} rounds of matches
  */
-export function matchCombinations(teams) {
+export function matchPermutations(teams) {
+    if (teams.length % 2 !== 0) {
+        teams.push({ name: "BYE", players: [] });
+    }
+    const matchesPerRound = teams.length / 2;
     const rounds = [];
-    const totalTeams = teams.length;
-    const totalRounds = totalTeams - 1; // Each team plays every other team once
-    for (let round = 0; round < totalRounds; round++) {
-        const matches = [];
-        const usedTeams = new Set();
-        for (let i = 0; i < totalTeams; i++) {
-            const teamA = teams[i];
-            if (usedTeams.has(teamA)) continue;
-            let teamB = null;
-            for (let j = 0; j < totalTeams; j++) {
-                if (i === j) continue; // Skip same team
-                const candidate = teams[j];
-                if (
-                    !usedTeams.has(candidate)
-                    && !matches.some(
-                        m => (m.teamA === teamA && m.teamB === candidate)
-                        || (m.teamA === candidate && m.teamB === teamA)
-                    )
-                ) {
-                    teamB = candidate;
-                    break;
-                }
-            }
-            if (teamB) {
-                matches.push({ teamA, teamB });
-                usedTeams.add(teamA);
-                usedTeams.add(teamB);
-            }
+    const teamIds = teams.map((_, i) => i);
+
+    for (let round = 0; round < teams.length - 1; round++) {
+        const roundMatches = [];
+        for (let i = 0; i < matchesPerRound; i++) {
+            const teamA = teams[teamIds[i]];
+            const teamB = teams[teamIds[teams.length - 1 - i]];
+            roundMatches.push({ teamA, teamB });
         }
-        rounds.push(matches);
+        rounds.push(roundMatches);
+        // Rotate teams except the first one
+        teamIds.splice(1, 0, teamIds.pop());
     }
     return rounds;
 }
