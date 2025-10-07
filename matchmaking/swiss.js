@@ -19,13 +19,13 @@ export function generateTeams(players) {
     const selectedTeams = [];
     const usedPlayerIds = new Set();
     while (finalPlayers.length >= 3) {
-        const nextTeam = teamsWithProximity.find(t => !t.team.some(p => usedPlayerIds.has(p.id)));
+        const nextTeam = teamsWithProximity.find(t => !t.team.players.some(p => usedPlayerIds.has(p.name)));
         if (!nextTeam) break;
         selectedTeams.push(nextTeam.team);
-        nextTeam.team.forEach(p => usedPlayerIds.add(p.id));
-        finalPlayers = finalPlayers.filter(p => !usedPlayerIds.has(p.id));
+        nextTeam.team.players.forEach(p => usedPlayerIds.add(p.name));
+        finalPlayers = finalPlayers.filter(p => !usedPlayerIds.has(p.name));
     }
-    return {selectedTeams, removedPlayers};
+    return { selectedTeams, removedPlayers };
 }
 
 /**
@@ -33,9 +33,10 @@ export function generateTeams(players) {
  * @return {{finalPlayers: Array<Types.Player>, removedPlayers: Array<Types.Player>}}
  */
 export function removeExtraPlayers(players) {
-    const finalPlayers = [...players];
+
+    let finalPlayers = [...players];
     /** @type {Array<Types.Player>} */
-    const removedPlayers = [];
+    let removedPlayers = [];
     if (players.length % 6 !== 0) {
         const indicesToRemove = [];
         for (let i = 0; i < players.length % 3; i++) {
@@ -57,52 +58,58 @@ export function removeExtraPlayers(players) {
  * @returns {Array<Array<Types.Match>>} rounds of matches
  */
 export function generateMatches(teams, rounds = 4) {
-    const allRounds = [];
-    /**
-     * @type {Array<{team:Types.Team, matchesAgainst: Array<Types.Team|null>}>}
-     */
-    const teamEntries = teams.map(team => ({team, matchesAgainst: []}));
-    for (let round = 0; round < rounds; round++) {
-        const matches = [];
-        const availableTeams = [...teamEntries];
-        while (availableTeams.length >= 2) {
-            const match = getMatch(availableTeams);
-            if (!match) break;
-            matches.push(match);
-            availableTeams.splice(availableTeams.indexOf(match.teamAEntry), 1);
-            availableTeams.splice(availableTeams.indexOf(match.teamBEntry), 1);
+    const roundsArr = [];
+    let allCombinations = matchCombinations(teams);
+    for (let i = 0; i < rounds; i++) {
+        if (i < allCombinations.length) {
+            roundsArr.push(allCombinations[i]);
         }
-        allRounds.push(matches.map(m => ({teamA: m.teamAEntry.team, teamB: m.teamBEntry.team})));
+        else {
+            const idx = Math.floor(Math.random() * allCombinations.length);
+            const randomRound = allCombinations[idx];
+            roundsArr.push(randomRound);
+            allCombinations.splice(idx, 1);
+        }
     }
-    return allRounds;
+    return roundsArr;
 }
 
-function getMatch(availableTeams) {
-    /**
-     * @type {{teamAEntry: {team:Types.Team, matchesAgainst: Array<Types.Team|null>}, teamBEntry: {team:Types.Team, matchesAgainst: Array<Types.Team|null>}} | null}
-     */
-    let bestPair = null;
-    let bestScore = -Infinity;
-    for (let i = 0; i < availableTeams.length - 1; i++) {
-        for (let j = i + 1; j < availableTeams.length; j++) {
-            const teamAEntry = availableTeams[i];
-            const teamBEntry = availableTeams[j];
-            if (teamAEntry.matchesAgainst.includes(teamBEntry.team) || teamBEntry.matchesAgainst.includes(teamAEntry.team)) {
-                continue;
+/**
+ * @param {Array<Types.Team>} teams
+ * @returns {Array<Array<Types.Match>>} rounds of matches
+ */
+export function matchCombinations(teams) {
+    const rounds = [];
+    const totalTeams = teams.length;
+    const totalRounds = totalTeams - 1; // Each team plays every other team once
+    for (let round = 0; round < totalRounds; round++) {
+        const matches = [];
+        const usedTeams = new Set();
+        for (let i = 0; i < totalTeams; i++) {
+            const teamA = teams[i];
+            if (usedTeams.has(teamA)) continue;
+            let teamB = null;
+            for (let j = 0; j < totalTeams; j++) {
+                if (i === j) continue; // Skip same team
+                const candidate = teams[j];
+                if (
+                    !usedTeams.has(candidate)
+                    && !matches.some(
+                        m => (m.teamA === teamA && m.teamB === candidate)
+                        || (m.teamA === candidate && m.teamB === teamA)
+                    )
+                ) {
+                    teamB = candidate;
+                    break;
+                }
             }
-            const eloA = getTeamElo(teamAEntry.team);
-            const eloB = getTeamElo(teamBEntry.team);
-            const score = -(Math.abs(eloA - eloB)); // Prefer matches with closer Elo
-            if (score > bestScore) {
-                bestScore = score;
-                bestPair = {teamAEntry, teamBEntry};
+            if (teamB) {
+                matches.push({ teamA, teamB });
+                usedTeams.add(teamA);
+                usedTeams.add(teamB);
             }
         }
+        rounds.push(matches);
     }
-    if (bestPair) {
-        bestPair.teamAEntry.matchesAgainst.push(bestPair.teamBEntry.team);
-        bestPair.teamBEntry.matchesAgainst.push(bestPair.teamAEntry.team);
-        return bestPair;
-    }
-    return null;
+    return rounds;
 }

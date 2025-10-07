@@ -11,32 +11,54 @@
 
 <body>
     <img id="background" src="assets/images/backgrounds/bg1.png" alt="background">
-    <div id="team_list">
+    <div class="main">
 
+        <div class="left_side">
+            
+        <div id="team_list">
+            
+            
+        </div>
         <template id="team_template">
             <div class="team_container">
                 <img src="assets/images/teams/team1.png" alt="team background" class="team_background">
                 <div class="team_content">
-                    <p class="team_name">Equipe <span class="team_number">1</span> <span class="team_name"> Team
-                            Name</span></p>
-                    <p> Average rank: <span class="average_rank">1200 <img class="average_rank_icon"></span></p>
-                    <div class="player_list">
-                        <div class="player_entry">
-                            <p class="player_name">Player 1</p>
-                            <img class="player_rank">
+                    <p class="team_name">Equipe <span class="team_number">1</span><br /> <b><span
+                        class="team_name_name">
+                        Team
+                        Name</span></b></p>
+                        <div class="player_list">
+                            <div class="player_entry">
+                                <p class="player_name">Player 1</p>
+                                <img class="player_rank">
+                            </div>
+                            <div class="player_entry">
+                                <p class="player_name">Player 2</p>
+                                <img class="player_rank">
+                            </div>
+                            <div class="player_entry">
+                                <p class="player_name">Player 3</p>
+                                <img class="player_rank">
+                            </div>
                         </div>
-                        <div class="player_entry">
-                            <p class="player_name">Player 2</p>
-                            <img class="player_rank">
-                        </div>
-                        <div class="player_entry">
-                            <p class="player_name">Player 3</p>
-                            <img class="player_rank">
-                        </div>
+                        <p class="average_rank_text">
+                            <span class="average_rank_elo">Rank: &nbsp; </span>
+                            <span class="average_rank">1200</span>
+                            <img class="average_rank_icon">
+                        </p>
                     </div>
                 </div>
+            </template>
+        </div>
+        <div class="right_side">
+            a
+            <div class="matches_container">
             </div>
-        </template>
+            
+            <div class="buttons_container">
+            </div>
+        </div>
+            
     </div>
 </body>
 

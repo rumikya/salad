@@ -249,7 +249,7 @@ start_button.addEventListener("click", function() {
 
     setPlayers(JSON.parse(sessionStorage.getItem('playersList')).map(p => ({
         name: p.name,
-        rank: p[eloKey],
+        rank: players.find(t => t.name === p.name && t.role === p.role)[eloKey],
         role: databaseRoleToRole(p.role),
         isActive: true
     })), gameMode);

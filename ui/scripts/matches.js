@@ -1,4 +1,4 @@
-import { playerCache } from "../../models.js";
+import { playerCache, eloToRank } from "../../models.js";
 import * as matchmaking from "../../matchmaking/index.js";
 
 
@@ -15,8 +15,8 @@ const teamNames = [
 
 function convertTeams(players) {
     const teams = players.map((team, index) => ({
-        name: index >= teamNames.length ? teamNames.at(-1) + " " + index : teamNames[index],
-        players: team
+        name: index >= teamNames.length ? teamNames.at(-1) + " " + (index) : teamNames[index],
+        players: team.players
     }));
     return teams;
 }
@@ -40,7 +40,9 @@ let matches = [];
 const firstFuncToCall = {
     "swiss": () => {
         teams = matchmaking.generateSwissTeams();
-        matches = matchmaking.generateSwissMatches(convertTeams(teams));
+        console.log(teams)
+        matches = matchmaking.generateSwissMatches(convertTeams(teams.selectedTeams));
+        console.log(matches)
         return matches.pop();
     },
     "salad100": matchmaking.getSalad100Round
@@ -79,9 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return getTeamIndex(a) - getTeamIndex(b);
     });
 
+    console.log(matches)
+    console.log(playerTeams)
+    team_list.innerHTML = '';
+
     playerTeams.forEach((team) => {
         // remove all children from team_list
-        team_list.innerHTML = '';
         createTeam(team);
     });
 });
@@ -92,19 +97,32 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {import("../../types.js").Team} team 
  */
 function createTeam(team) {
+    const teamTemplate = document.getElementById("team_template");
     /**
      * @type {DocumentFragment}
      */
-    const teamCopy = document.importNode(team_template.content, true);
+
+    const teamCopy = document.importNode(teamTemplate.content, true);
     const teamEntry = teamCopy.firstElementChild;
 
     let index = getTeamIndex(team);
+    teamEntry.querySelector('.team_number').innerHTML = `${index}`
     if(index >= teamNames.length) {
         index = teamNames.length - 1;
     }
+    const averageElo = team.players.reduce((acc, player) => acc + player.rank, 0) / 3;
+
+    teamEntry.querySelector('.team_background').src = `assets/images/teams/team${index+1}.png`;
+    teamEntry.querySelector('.team_name_name').innerHTML = `${team.name}`
+    teamEntry.querySelector('.average_rank').innerHTML = `${Math.floor(averageElo)}`
+    teamEntry.querySelector('.average_rank_icon').src = 'assets/images/ranks/' + eloToRank(averageElo) + '.png'
 
 
-    teamEntry.querySelector('.team_background').src = `assets/images/teams/team${index}.png`;
+    teamEntry.querySelectorAll('.player_entry').forEach((entry, index) => {
+        entry.querySelector('.player_name').innerHTML = team.players[index].name
+        entry.querySelector('.player_rank').src = 'assets/images/ranks/' + eloToRank(team.players[index].rank) + '.png' 
+
+    })
 
     team_list.appendChild(teamEntry);
 }

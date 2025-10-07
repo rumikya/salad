@@ -4,13 +4,21 @@
     margin: 0;
     padding: 0;
     width: fit-content;
+    scrollbar-color: #222222 #00000020;
+
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
 }
 
 .main {
     display: flex;
     flex-direction: row; 
     justify-content: space-between;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
 }
 
 
@@ -24,4 +32,96 @@
     height: 100%;
     z-index: -1;
     object-fit: cover;
+}
+
+
+#team_list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 3em;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 3em;
+    overflow-y: scroll;
+}
+
+.team_container {
+    padding: 20px;
+    width: 240px;
+    position: relative;
+    border: 1px solid #00000020;
+    border-radius: 5px;
+    color: black;
+    background: white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    height: 325px;
+}
+
+.team_name {
+    width: 100%;
+}
+
+.average_rank, .average_rank_elo {
+    margin-top: 5px;
+}
+
+.average_rank_text {
+    margin-top: 10px;
+}
+
+.average_rank_text, .player_entry {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.player_name, .average_rank_text {
+    text-align: left;
+}
+
+.player_entry {
+    width: 200px;
+}
+
+.player_name {
+    width: 140px;
+}
+
+.average_rank_elo {
+    width: 105px;
+}
+
+.average_rank_icon, .player_rank {
+    width: 32px;
+    margin-left: 5px;
+}
+
+.player_list {
+    margin-top: 10px;
+}
+
+.team_background {
+    width: 100%;
+    margin-top: -100px;
+}
+
+.left_side {
+    width: 75%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.right_side {
+    flex: 1;
+    background: #00000080;
+    height: 100%;
 }
