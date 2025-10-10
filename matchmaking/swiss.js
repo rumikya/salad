@@ -93,7 +93,7 @@ export function generateMatches(teams, rounds = 4) {
  */
 export function matchPermutations(teams) {
     if (teams.length % 2 !== 0) {
-        teams.push({ name: "BYE", players: [] });
+        teams.push({ name: "BYE round", players: [] });
     }
     const matchesPerRound = teams.length / 2;
     const rounds = [];

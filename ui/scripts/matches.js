@@ -1,7 +1,10 @@
 import { playerCache, eloToRank } from "../../models.js";
 import * as matchmaking from "../../matchmaking/index.js";
-
-
+import { getWinningPlayers, setWinner } from "../../caches.js";
+/**
+ * @callback getScoreCallback
+ * @returns {{match: import("../../types.js").Match, teamAScore: number, teamBScore: number}}
+ */
 const teamNames = [
     "FrostFire",
     "Ember Monarchs",
@@ -12,7 +15,10 @@ const teamNames = [
     "Demon Drive",
     "AimiTank"
 ]
-
+/**
+ * @type {getScoreCallback[]}
+ */
+const matchList = [];
 function convertTeams(players) {
     const teams = players.map((team, index) => ({
         name: index >= teamNames.length ? teamNames.at(-1) + " " + (index) : teamNames[index],
@@ -23,7 +29,7 @@ function convertTeams(players) {
 
 function getTeamIndex(team) {
     const index = teamNames.indexOf(team.name);
-    if(index == -1) {
+    if (index == -1) {
         return parseInt(team.name.split(" ").at(-1));
     }
     return index;
@@ -69,7 +75,7 @@ const players = playerCache;
  */
 let playerTeams = [];
 document.addEventListener('DOMContentLoaded', () => {
-    const backgroundChoices = Array.from({length: 7}, (_, i) => `bg${i + 1}.png`);
+    const backgroundChoices = Array.from({ length: 7 }, (_, i) => `bg${i + 1}.png`);
     background.src = `assets/images/backgrounds/${backgroundChoices[Math.floor(Math.random() * backgroundChoices.length)]}`;
 
     /**
@@ -81,14 +87,59 @@ document.addEventListener('DOMContentLoaded', () => {
         return getTeamIndex(a) - getTeamIndex(b);
     });
 
-    console.log(matches)
-    console.log(playerTeams)
     team_list.innerHTML = '';
 
     playerTeams.forEach((team) => {
-        // remove all children from team_list
+        if(team.name === "BYE round") return;
         createTeam(team);
     });
+    if (matches.length == 0) {
+        next_button.disabled = true;
+    }
+    if (teams.removedPlayers && teams.removedPlayers.length != 0) {
+        createSkippedPlayersEntry(teams.removedPlayers);
+    }
+    matches.forEach(match => createMatch(match));
+    next_button.addEventListener('click', () => {
+        for (const matchFunc of matchList) {
+            const { match, teamAScore, teamBScore } = matchFunc();
+            setWinner(match, teamAScore > teamBScore ? match.teamA : match.teamB);
+        }
+        matchList.length = 0;
+        team_list.innerHTML = '';
+        match_list.innerHTML = '';
+        const nextRoundMatches = nextMatches[gameMode]();
+        if (!nextRoundMatches || nextRoundMatches.length == 0) {
+            next_button.disabled = true;
+            return;
+        }
+        playerTeams = nextRoundMatches.flatMap(m => [m.teamA, m.teamB]).sort((a, b) => {
+            return getTeamIndex(a) - getTeamIndex(b);
+        });
+        if(gameMode === "swiss"){
+            
+            playerTeams.forEach((team) => {
+                if(team.name === "BYE round") return;
+                createTeam(team);
+            });
+        }
+        nextRoundMatches.forEach(match => createMatch(match));
+    });
+    result_button.addEventListener('click', () => {
+        result_modal.showModal();
+        const resultsContainer = document.getElementById("results_container");
+        resultsContainer.innerHTML = '';
+        const winningPlayers = getWinningPlayers();
+        winningPlayers.forEach(winningPlayer => createWinEntry(winningPlayer.player, winningPlayer.wins));
+    });
+    close_result_modal.addEventListener('click', closeResultModal);
+    clear_results_button.addEventListener('click', () => {
+        results_container.innerHTML = '';
+        sessionStorage.removeItem('winHistory');
+    });
+    edit_button.addEventListener('click', () => {
+        window.location.href = "index.html";
+    })
 });
 
 
@@ -107,12 +158,12 @@ function createTeam(team) {
 
     let index = getTeamIndex(team);
     teamEntry.querySelector('.team_number').innerHTML = `${index}`
-    if(index >= teamNames.length) {
+    if (index >= teamNames.length) {
         index = teamNames.length - 1;
     }
     const averageElo = team.players.reduce((acc, player) => acc + player.rank, 0) / 3;
 
-    teamEntry.querySelector('.team_background').src = `assets/images/teams/team${index+1}.png`;
+    teamEntry.querySelector('.team_background').src = `assets/images/teams/team${index + 1}.png`;
     teamEntry.querySelector('.team_name_name').innerHTML = `${team.name}`
     teamEntry.querySelector('.average_rank').innerHTML = `${Math.floor(averageElo)}`
     teamEntry.querySelector('.average_rank_icon').src = 'assets/images/ranks/' + eloToRank(averageElo) + '.png'
@@ -120,10 +171,79 @@ function createTeam(team) {
 
     teamEntry.querySelectorAll('.player_entry').forEach((entry, index) => {
         entry.querySelector('.player_name').innerHTML = team.players[index].name
-        entry.querySelector('.player_rank').src = 'assets/images/ranks/' + eloToRank(team.players[index].rank) + '.png' 
+        entry.querySelector('.player_rank').src = 'assets/images/ranks/' + eloToRank(team.players[index].rank) + '.png'
 
     })
 
     team_list.appendChild(teamEntry);
 }
 
+/**
+ * 
+ * @param {import("../../types.js").Match} match 
+ */
+function createMatch(match) {
+    const matchTemplate = document.getElementById("match_template");
+    /**
+     * @type {DocumentFragment}
+     */
+    const matchCopy = document.importNode(matchTemplate.content, true);
+    const matchEntry = matchCopy.firstElementChild;
+    const indexTeam1 = getTeamIndex(match.teamA);
+    const indexTeam2 = getTeamIndex(match.teamB);
+    matchEntry.querySelector(".team_1_icon").src = `assets/images/teams/team${indexTeam1 + 1}.png`;
+    matchEntry.querySelector(".team_1_name").innerHTML = match.teamA.name;
+    matchEntry.querySelector(".team_2_icon").src = `assets/images/teams/team${indexTeam2 + 1}.png`;
+    matchEntry.querySelector(".team_2_name").innerHTML = match.teamB.name;
+    if(match.teamA.name === "BYE round") {
+        matchEntry.querySelector(".team_1_icon").src = `assets/images/teams/skipped_player.png`;
+    }
+    if(match.teamB.name === "BYE round") {
+        matchEntry.querySelector(".team_2_icon").src = `assets/images/teams/skipped_player.png`;
+    }
+    const teamAScoreInput = matchEntry.querySelector(".team_1_score");
+    const teamBScoreInput = matchEntry.querySelector(".team_2_score");
+    if(match.teamA.name === "BYE round") {
+        teamAScoreInput.value = "0";
+        teamAScoreInput.disabled = true;
+        teamBScoreInput.value = "3";
+        teamBScoreInput.disabled = true;
+    }
+    if(match.teamB.name === "BYE round") {
+        teamBScoreInput.value = "0";
+        teamBScoreInput.disabled = true;
+        teamAScoreInput.value = "3";
+        teamAScoreInput.disabled = true;
+    }
+    document.getElementById("match_list").appendChild(matchEntry);
+    matchList.push(() => { return { match, get teamScore() { return parseInt(teamAScoreInput.value) || 0 }, teamBScore: parseInt(teamBScoreInput.value) || 0 } });
+}
+/**
+ * 
+ * @param {import("../../types.js").Player} player 
+ * @param {number} wins 
+ */
+function createWinEntry(player, wins) {
+    const winTemplate = document.getElementById("winner_template");
+    const winCopy = document.importNode(winTemplate.content, true);
+    const winEntry = winCopy.firstElementChild;
+    winEntry.querySelector(".winner_player_name").innerHTML = player.name;
+    winEntry.querySelector(".win_count").innerHTML = wins.toString();
+    results_container.appendChild(winEntry);
+}
+function createSkippedPlayersEntry(players) {
+    const skippedTemplate = document.getElementById("skipped_players_template");
+    const skippedCopy = document.importNode(skippedTemplate.content, true);
+    const skippedList = skippedCopy.getElementById("skipped_player_list");
+    players.forEach(player => {
+        const playerEntry = document.createElement("p");
+        playerEntry.classList.add("player_name");
+        playerEntry.innerHTML = player.name;
+        skippedList.appendChild(playerEntry);
+    });
+    team_list.appendChild(skippedCopy);
+}
+
+function closeResultModal() {
+    result_modal.close();
+}

@@ -124,4 +124,105 @@ html, body {
     flex: 1;
     background: #00000080;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+.buttons_container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    grid-template-columns: 1fr;
+}
+.action_button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    margin: 10px;
+}
+.matches_container {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.match_entry {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: auto;
+    padding: 10px;
+    background-color: white;
+    border-radius: 16px;
+    margin: 20px;
+    gap: 20px;
+}
+.match_teams {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    align-items: center;
+    gap: 2dvw;
+    margin-bottom: 12px;
+    margin-top: 12px;
+}
+.match_team_logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin: 0 8px;
+}
+.match_score{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2dvw;
+    font-size: 24px;
+    font-weight: bold;
+}
+input.team1_score, input.team2_score {
+    width: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    appearance: none;
+    border: none;
+    background: none;
+    outline: none;
+    box-shadow: none;
+}
+::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+#result_modal {
+    border: none;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#close_result_modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+#results_container {
+    margin-top: 30px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.winner_entry {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }

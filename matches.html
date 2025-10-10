@@ -14,19 +14,30 @@
     <div class="main">
 
         <div class="left_side">
-            
-        <div id="team_list">
-            
-            
-        </div>
-        <template id="team_template">
-            <div class="team_container">
-                <img src="assets/images/teams/team1.png" alt="team background" class="team_background">
-                <div class="team_content">
-                    <p class="team_name">Equipe <span class="team_number">1</span><br /> <b><span
-                        class="team_name_name">
-                        Team
-                        Name</span></b></p>
+
+            <div id="team_list">
+
+            </div>
+            <template id="skipped_players_template">
+                <div class="skipped_player_container team_container">
+                    <img src="assets/images/teams/skipped_player.png" alt="skipped player background"
+                        class="skipped_player_background team_background">
+                    <div class="skipped_player_content">
+                        <p class="skipped_player_text">Joueurs<br /><b>Non Assignés</b></p>
+                        <div class="player_list" id="skipped_player_list">
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <template id="team_template">
+                <div class="team_container">
+                    <img src="assets/images/teams/team1.png" alt="team background" class="team_background">
+                    <div class="team_content">
+                        <p class="team_name">Equipe <span class="team_number">1</span><br /> <b><span
+                                    class="team_name_name">
+                                    Team
+                                    Name</span></b></p>
                         <div class="player_list">
                             <div class="player_entry">
                                 <p class="player_name">Player 1</p>
@@ -51,15 +62,54 @@
             </template>
         </div>
         <div class="right_side">
-            a
-            <div class="matches_container">
+            <div class="matches_container" id="match_list">
+
             </div>
-            
+            <template id="match_template">
+                <div class="match_entry">
+                    <div class="match_teams">
+                        <div class="team1">
+                            <img class="match_team_logo team_1_icon" alt="team 1">
+                            <p class="team_name team_1_name">Team 1</p>
+                        </div>
+                        <p class="vs_text">VS</p>
+                        <div class="team2">
+                            <img class="match_team_logo team_2_icon" alt="team 2">
+                            <p class="team_name team_2_name">Team 2</p>
+                        </div>
+                    </div>
+                    <div class="match_score">
+                        <input type="number" class="team1_score team_1_score" value="0">
+                        <p class="separator">-</p>
+                        <input type="number" class="team2_score team_2_score" value="0">
+                    </div>
+                </div>
+            </template>
             <div class="buttons_container">
+                <button id="next_button" class="action_button"><img src="assets/images/buttons/next_round_v2.png"
+                        alt="Next"></button>
+                <button id="result_button" class="action_button"><img src="assets/images/buttons/results_icon_v2.png"
+                        alt="Result"></button>
+                <button id="edit_button" class="action_button"><img src="assets/images/buttons/modify_button.png"
+                        alt="Edit"></button>
             </div>
         </div>
-            
     </div>
+    <dialog id="result_modal">
+        <div class="modal_content">
+            <span class="close_button" id="close_result_modal">&times;</span>
+            <h2>Gagnants</h2>
+            <div class="results_container" id="results_container">
+            </div>
+            <button id="clear_results_button">clear results</button>
+        </div>
+    </dialog>
+    <template id="winner_template">
+        <div class="winner_entry">
+            <p class="winner_player_name">Player Name</p>
+            <p class="win_count">+25</p>
+        </div>
+    </template>
 </body>
 
 </html>

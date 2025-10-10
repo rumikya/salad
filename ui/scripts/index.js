@@ -72,6 +72,7 @@ remove_player_button.addEventListener("click", function() {
         entries[entries.length - 1].remove();
         setPlayerSelects();
         setPlayerCount();
+        updatePlayerList();
     }
 })
 
@@ -246,13 +247,13 @@ start_button.addEventListener("click", function() {
         eloKey = "salad_elo";
     }
 
-
-    setPlayers(JSON.parse(sessionStorage.getItem('playersList')).map(p => ({
+    const activePlayers = JSON.parse(sessionStorage.getItem('playersList')).map(p => ({
         name: p.name,
         rank: players.find(t => t.name === p.name && t.role === p.role)[eloKey],
         role: databaseRoleToRole(p.role),
         isActive: true
-    })), gameMode);
+    }))
+    setPlayers(activePlayers, gameMode);
 
     window.location.href = "matches.html";
 })

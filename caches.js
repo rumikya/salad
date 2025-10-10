@@ -19,15 +19,15 @@ export const winHistory = sessionStorage.getItem('winHistory') ? JSON.parse(sess
 export function setPlayers(players, mode) {
     const playerCache = models.playerCache;
     if (mode === "salad100") {
+        // Set every cached player not in players as inactive
+        playerCache.forEach(cachedPlayer => {
+            if (!players.some(player => player.id === cachedPlayer.id)) {
+                cachedPlayer.isActive = false;
+            }
+        });
         const mergedPlayers = players.map(player => {
             const cached = playerCache.find(p => p.id === player.id);
-            // Set every cached player not in players as inactive
-            playerCache.forEach(cachedPlayer => {
-                if (!players.some(player => player.id === cachedPlayer.id)) {
-                    cachedPlayer.inactive = true;
-                }
-            });
-            return { ...players, ...(cached || {}) };
+            return { ...player, ...(cached || {}), isActive: true };
         });
         sessionStorage.setItem('playerCache', JSON.stringify(mergedPlayers));
         return;
@@ -52,7 +52,7 @@ export function setWinner(match, winningTeam) {
 
 /**
  * 
- * @returns {Types.Player[]}
+ * @returns {{player:Types.Player, wins: number}[]}
  */
 export function getWinningPlayers() {
     /**
@@ -72,9 +72,9 @@ export function getWinningPlayers() {
     }
 
     winHistory.forEach((win) => {
-        win.winner.players.forEach(addWin)
+        win.winningTeam.players.forEach(addWin)
     })
-    players.sort((a,b)=>a.wins-b.wins);
-    let maxWin = players[0];
+    players.sort((a,b)=>b.wins-a.wins);
+    let maxWin = players[0].wins;
     return players.filter(player => player.wins == maxWin)
 }

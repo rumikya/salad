@@ -9,7 +9,7 @@ export function getTeamElo(team) {
 }
 
 /**
- * @param {Array<Types.Player} players 
+ * @param {Array<Types.Player>} players 
  * @returns {Array<Types.Team>}
  */
 export function getAllUniqueTeams(players) {
@@ -20,7 +20,10 @@ export function getAllUniqueTeams(players) {
     for (let i = 0; i < players.length - 2; i++) {
         for (let j = i + 1; j < players.length - 1; j++) {
             for (let k = j + 1; k < players.length; k++) {
-                teams.push({players:[players[i], players[j], players[k]],name:""});
+                teams.push({
+                    players:[ {...players[i]}, {...players[j]}, {...players[k]} ],
+                    name: ""
+                })
             }
         }
     }

@@ -1,26 +1,27 @@
 import * as Types from '../types.js';
 import { matchHistory } from '../caches.js';
 import { getTeamElo, getAllUniqueTeams } from './utils.js';
-
+import * as models from '../models.js';
 /**
  * this should be set once per page load
- * @type {Array<Array<Types.Team>>}
+ * @type {Array<Types.Team>}
  */
 let teamsCache = [];
 
 
 /**
  * return this round's pairings
- * @returns {Array<Types.Match}
+ * @returns {Array<Types.Match>}
  */
 export function getPairings(recall = false) {
     const matches = [];
     if (!recall)
         teamsCache = getAllUniqueTeams(models.playerCache);
-    const remainingTeams = [...teamsCache];
+    let remainingTeams = [...teamsCache];
     while (remainingTeams.length >= 2) {
         const match = getPairing(remainingTeams);
-        remainingTeams = remainingTeams.filter(team => team !== match.teamA && team !== match.teamB);
+        remainingTeams = remainingTeams.filter(team => 
+            team.players.some(p=> match.teamA.players.some(pa => pa.id === p.id)) === false && (match.teamB ? team.players.some(p=> match.teamB.some(pa => pa.id === p.id)) === false : true));
         matches.push(match);
     }
     return matches;
@@ -38,19 +39,23 @@ export function getPairing(availableTeams) {
     let bestMatchScore = Infinity;
     for (let i = 0; i < availableTeams.length; i++) {
         const teamB = availableTeams[i];
-        const score = matchSimilarityScore(teamA, teamB) + Math.abs(getTeamElo(teamA) - getTeamElo(teamB));
+        // Ensure teamA and teamB are not the same team
+        if (teamA.players.some((p, idx) => teamB.players[idx] && p.id === teamB.players[idx].id)) {
+            continue;
+        }
+        const score = matchSimilarityScore(teamA.players, teamB.players) + Math.abs(getTeamElo(teamA) - getTeamElo(teamB));
         if (score < bestMatchScore) {
             bestMatchScore = score;
             bestMatchIndex = i;
         }
     }
-    return { teamA, teamB: availableTeams[bestMatchIndex] };
+    return { teamA, teamB: bestMatchIndex !== -1 ? availableTeams[bestMatchIndex] : null };
 }
 
 
 
 function matchSimilarityScore(teamA, teamB) {
-    const similarityPenality = 50;
+    const similarityPenalty = 50;
     let score = 0;
     matchHistory.forEach(match => {
         const teamAIds = teamA.map(player => player.id);
@@ -60,7 +65,7 @@ function matchSimilarityScore(teamA, teamB) {
         const teamAMatchCount = teamAIds.filter(id => matchTeamAIds.includes(id)).length;
         const teamBMatchCount = teamBIds.filter(id => matchTeamBIds.includes(id)).length;
         if (teamAMatchCount > 0 && teamBMatchCount > 0) {
-            score += (teamAMatchCount + teamBMatchCount) * similarityPenality;
+            score += (teamAMatchCount + teamBMatchCount) * similarityPenalty;
         }
     });
     return score;
