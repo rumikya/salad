@@ -68,21 +68,14 @@ export function generateMatches(teams, rounds = 4) {
         const existingRounds = roundsArr.map(round =>
             round.map(match => [match.teamA.name, match.teamB.name].sort().join('-')).sort().join('|')
         );
-        let nextRound = allCombinations.find(round => {
+        let nextPossibleRounds = allCombinations.filter(round => {
             const roundKey = round.map(match => [match.teamA.name, match.teamB.name].sort().join('-')).sort().join('|');
             return !existingRounds.includes(roundKey);
         });
-        if (nextRound) {
-            roundsArr.push(nextRound);
-            allCombinations = allCombinations.filter(r => r !== nextRound);
-        } else if (i < allCombinations.length) {
-            roundsArr.push(allCombinations[i]);
-        } else if (allCombinations.length > 0) {
-            const idx = Math.floor(Math.random() * allCombinations.length);
-            const randomRound = allCombinations[idx];
-            roundsArr.push(randomRound);
-            allCombinations.splice(idx, 1);
-        }
+        const idx = Math.floor(Math.random() * nextPossibleRounds.length);
+        const nexRound = nextPossibleRounds[idx]
+        roundsArr.push(nexRound);
+        allCombinations.splice(idx,1);
     }
     return roundsArr;
 }

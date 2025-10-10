@@ -3,7 +3,6 @@ import * as matchmaking from "../../matchmaking/index.js";
 import { getWinningPlayers, resetWinHistory, setWinner } from "../../caches.js";
 
 
-
 /**
  * @callback getScoreCallback
  * @returns {{match: import("../../types.js").Match, teamAScore: number, teamBScore: number}}
@@ -38,6 +37,19 @@ function convertTeams100(teams) {
     })
 }
 
+function getTeams100(teams) {
+    convertTeams100(teams)
+    return {
+        selectedTeams: teams,
+        get removedPlayers() {
+            const players = teams.flatMap(x => x.players)
+            console.log(players.length)
+            const skipped = playerCache.filter(x => x.isActive && !players.some(player => player.name === x.name)); 
+            return skipped
+        }
+    }
+}
+
 function getTeamIndex(team) {
     const index = teamNames.indexOf(team.name);
     if (index == -1) {
@@ -64,7 +76,7 @@ const firstFuncToCall = {
     },
     "salad100": () => {
         const matches = matchmaking.getSalad100Round()
-        convertTeams100(matches.flatMap((m) => [m.teamA, m.teamB]))
+        teams = getTeams100(matches.flatMap((m) => [m.teamA, m.teamB]))
         return matches;
     }
 }
@@ -79,12 +91,13 @@ const nextMatches = {
 const regenTeams = {
     "swiss": () => {
         teams = matchmaking.generateSwissTeams();
-        matches = matchmaking.generateSwissMatches(convertTeams(teams));
+        console.log(teams)
+        matches = matchmaking.generateSwissMatches(convertTeams(teams.selectedTeams));
         return matches.pop();
     },
     "salad100": () => {
         const matches = matchmaking.rerollSalad100Round();
-        convertTeams100(matches.flatMap((m) => [m.teamA, m.teamB]))
+        teams = getTeams100(matches.flatMap((m) => [m.teamA, m.teamB]))
         return matches;
     }
 }
@@ -193,7 +206,7 @@ function createTeam(team) {
     const teamEntry = teamCopy.firstElementChild;
 
     let index = getTeamIndex(team);
-    teamEntry.querySelector('.team_number').innerHTML = `${index}`
+    teamEntry.querySelector('.team_number').innerHTML = `${index + 1}`
     if (index >= teamNames.length) {
         index = teamNames.length - 1;
     }

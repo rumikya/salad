@@ -23,10 +23,12 @@ export function getPairings(recall = false) {
         
         if(!match.teamB) break;
 
-        remainingTeams = remainingTeams.filter(team => 
-            team.players.some(p=> 
-                !match.teamA.players.some(pa => pa.name === p.name)) && 
-                (match.teamB ? !team.players.some(p=> match.teamB.players.some(pa => pa.name === p.name)) : true));
+        remainingTeams = remainingTeams.filter(remainingTeam => 
+            !remainingTeam.players.some(remainingPlayer => 
+                match.teamA.players.some(teamAPlayer => teamAPlayer.name === remainingPlayer.name) 
+                || match.teamB.players.some(teamBPlayer => teamBPlayer.name === remainingPlayer.name)
+            )
+        );
         
         matches.push(match);
     }
@@ -66,10 +68,10 @@ function matchSimilarityScore(teamA, teamB) {
     const similarityPenalty = 50;
     let score = 0;
     matchHistory.forEach(match => {
-        const teamAIds = teamA.map(player => player.id);
-        const teamBIds = teamB.map(player => player.id);
-        const matchTeamAIds = match.teamA.players.map(player => player.id);
-        const matchTeamBIds = match.teamB.players.map(player => player.id);
+        const teamAIds = teamA.map(player => player.name);
+        const teamBIds = teamB.map(player => player.name);
+        const matchTeamAIds = match.teamA.players.map(player => player.name);
+        const matchTeamBIds = match.teamB.players.map(player => player.name);
         const teamAMatchCount = teamAIds.filter(id => matchTeamAIds.includes(id)).length;
         const teamBMatchCount = teamBIds.filter(id => matchTeamBIds.includes(id)).length;
         if (teamAMatchCount > 0 && teamBMatchCount > 0) {
