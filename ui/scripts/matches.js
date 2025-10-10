@@ -22,6 +22,8 @@ const teamNames = [
  */
 const matchList = [];
 
+let modalCloseCallback = function(){};
+
 function convertTeams(players) {
     const teams = players.map((team, index) => ({
         name: index >= teamNames.length ? teamNames.at(-1) + " " + (index) : teamNames[index],
@@ -138,6 +140,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         matches.forEach(match => createMatch(match));
     }
+    result_modal.addEventListener('click', function(event) {
+        const rect = result_modal.getBoundingClientRect();
+        const isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
+            rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
+        if (!isInDialog) {
+            closeResultModal();
+        }
+    });
 
     next_button.addEventListener('click', () => {
         for (const matchFunc of matchList) {
@@ -150,6 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextRoundMatches = nextMatches[gameMode]();
         if (!nextRoundMatches || nextRoundMatches.length == 0) {
             next_button.disabled = true;
+
+            result_button.click();
+            modalCloseCallback = () => {
+                window.location.href = "index.html";
+            }
             return;
         }
 
@@ -298,5 +313,7 @@ function createSkippedPlayersEntry(players) {
 }
 
 function closeResultModal() {
+    modalCloseCallback();
+
     result_modal.close();
 }

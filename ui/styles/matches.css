@@ -112,6 +112,7 @@ html, body {
 .team_background {
     width: 100%;
     margin-top: -100px;
+    max-height: 192px;
 }
 
 .left_side {
@@ -280,4 +281,14 @@ input.team2_score {
 
 #close_result_modal:hover {
     color: red;
+}
+
+
+.action_button:disabled {
+    opacity: 0.8;
+}
+
+
+.action_button:hover {
+    filter: brightness(0.8)
 }
