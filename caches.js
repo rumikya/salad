@@ -9,7 +9,7 @@ export const matchHistory = sessionStorage.getItem('matchHistory') ? JSON.parse(
 /**
  * @type {Types.WinHistory}
  */
-export const winHistory = sessionStorage.getItem('winHistory') ? JSON.parse(sessionStorage.getItem('winHistory')) : [];
+export let winHistory = sessionStorage.getItem('winHistory') ? JSON.parse(sessionStorage.getItem('winHistory')) : [];
 
 /**
  * call this when "randomizer" button is clicked
@@ -21,13 +21,13 @@ export function setPlayers(players, mode) {
     if (mode === "salad100") {
         // Set every cached player not in players as inactive
         playerCache.forEach(cachedPlayer => {
-            if (!players.some(player => player.id === cachedPlayer.id)) {
+            if (!players.some(player => player.name === cachedPlayer.name)) {
                 cachedPlayer.isActive = false;
             }
         });
         const mergedPlayers = players.map(player => {
-            const cached = playerCache.find(p => p.id === player.id);
-            return { ...player, ...(cached || {}), isActive: true };
+            const cached = playerCache.find(p => p.name === player.name);
+            return { ...player, ...(cached || {}) };
         });
         sessionStorage.setItem('playerCache', JSON.stringify(mergedPlayers));
         return;
@@ -77,4 +77,9 @@ export function getWinningPlayers() {
     players.sort((a,b)=>b.wins-a.wins);
     let maxWin = players[0].wins;
     return players.filter(player => player.wins == maxWin)
+}
+
+export function resetWinHistory() {
+    sessionStorage.removeItem('winHistory')
+    winHistory = [];
 }

@@ -1,6 +1,9 @@
 import { playerCache, eloToRank } from "../../models.js";
 import * as matchmaking from "../../matchmaking/index.js";
-import { getWinningPlayers, setWinner } from "../../caches.js";
+import { getWinningPlayers, resetWinHistory, setWinner } from "../../caches.js";
+
+
+
 /**
  * @callback getScoreCallback
  * @returns {{match: import("../../types.js").Match, teamAScore: number, teamBScore: number}}
@@ -19,12 +22,20 @@ const teamNames = [
  * @type {getScoreCallback[]}
  */
 const matchList = [];
+
 function convertTeams(players) {
     const teams = players.map((team, index) => ({
         name: index >= teamNames.length ? teamNames.at(-1) + " " + (index) : teamNames[index],
         players: team.players
     }));
     return teams;
+}
+
+function convertTeams100(teams) {
+    const convertedTeams = convertTeams(teams);
+    teams.forEach((v, k) => {
+        v.name = convertedTeams[k].name;
+    })
 }
 
 function getTeamIndex(team) {
@@ -51,22 +62,31 @@ const firstFuncToCall = {
         console.log(matches)
         return matches.pop();
     },
-    "salad100": matchmaking.getSalad100Round
+    "salad100": () => {
+        const matches = matchmaking.getSalad100Round()
+        convertTeams100(matches.flatMap((m) => [m.teamA, m.teamB]))
+        return matches;
+    }
 }
 
 const nextMatches = {
     "swiss": () => {
         return matches.pop()
     },
-    "salad100": matchmaking.getSalad100Round
+    "salad100": firstFuncToCall['salad100']
 }
 
 const regenTeams = {
     "swiss": () => {
         teams = matchmaking.generateSwissTeams();
-        matchmaking.generateSwissMatches(convertTeams(teams));
+        matches = matchmaking.generateSwissMatches(convertTeams(teams));
+        return matches.pop();
     },
-    "salad100": matchmaking.rerollSalad100Round
+    "salad100": () => {
+        const matches = matchmaking.rerollSalad100Round();
+        convertTeams100(matches.flatMap((m) => [m.teamA, m.teamB]))
+        return matches;
+    }
 }
 
 const players = playerCache;
@@ -83,23 +103,29 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const gameMode = sessionStorage.getItem('gameMode') || "swiss";
     const matches = firstFuncToCall[gameMode]();
-    playerTeams = matches.flatMap(m => [m.teamA, m.teamB]).sort((a, b) => {
-        return getTeamIndex(a) - getTeamIndex(b);
-    });
 
-    team_list.innerHTML = '';
+    init(matches)
 
-    playerTeams.forEach((team) => {
-        if(team.name === "BYE round") return;
-        createTeam(team);
-    });
-    if (matches.length == 0) {
-        next_button.disabled = true;
+    function init(matches) {
+        playerTeams = matches.flatMap(m => [m.teamA, m.teamB]).sort((a, b) => {
+            return getTeamIndex(a) - getTeamIndex(b);
+        });
+
+        team_list.innerHTML = '';
+        match_list.innerHTML = '';
+        playerTeams.forEach((team) => {
+            if (team.name === "BYE round") return;
+            createTeam(team);
+        });
+        if (matches.length == 0) {
+            next_button.disabled = true;
+        }
+        if (teams.removedPlayers && teams.removedPlayers.length != 0) {
+            createSkippedPlayersEntry(teams.removedPlayers);
+        }
+        matches.forEach(match => createMatch(match));
     }
-    if (teams.removedPlayers && teams.removedPlayers.length != 0) {
-        createSkippedPlayersEntry(teams.removedPlayers);
-    }
-    matches.forEach(match => createMatch(match));
+
     next_button.addEventListener('click', () => {
         for (const matchFunc of matchList) {
             const { match, teamAScore, teamBScore } = matchFunc();
@@ -113,17 +139,21 @@ document.addEventListener('DOMContentLoaded', () => {
             next_button.disabled = true;
             return;
         }
+
+
         playerTeams = nextRoundMatches.flatMap(m => [m.teamA, m.teamB]).sort((a, b) => {
             return getTeamIndex(a) - getTeamIndex(b);
         });
-        if(gameMode === "swiss"){
-            
-            playerTeams.forEach((team) => {
-                if(team.name === "BYE round") return;
-                createTeam(team);
-            });
-        }
+
+        playerTeams.forEach((team) => {
+            if (team.name === "BYE round") return;
+            createTeam(team);
+        });
         nextRoundMatches.forEach(match => createMatch(match));
+
+        if (teams.removedPlayers && teams.removedPlayers.length != 0) {
+            createSkippedPlayersEntry(teams.removedPlayers);
+        }
     });
     result_button.addEventListener('click', () => {
         result_modal.showModal();
@@ -135,10 +165,16 @@ document.addEventListener('DOMContentLoaded', () => {
     close_result_modal.addEventListener('click', closeResultModal);
     clear_results_button.addEventListener('click', () => {
         results_container.innerHTML = '';
-        sessionStorage.removeItem('winHistory');
+        resetWinHistory();
     });
     edit_button.addEventListener('click', () => {
         window.location.href = "index.html";
+    })
+
+
+    reroll_button.addEventListener("click", () => {
+        ;
+        init(regenTeams[gameMode]());
     })
 });
 
@@ -191,25 +227,29 @@ function createMatch(match) {
     const matchEntry = matchCopy.firstElementChild;
     const indexTeam1 = getTeamIndex(match.teamA);
     const indexTeam2 = getTeamIndex(match.teamB);
-    matchEntry.querySelector(".team_1_icon").src = `assets/images/teams/team${indexTeam1 + 1}.png`;
+
+    const team1ImageIndex = indexTeam1 >= teamNames.length ? teamNames.length - 1 : indexTeam1;
+    const team2ImageIndex = indexTeam2 >= teamNames.length ? teamNames.length - 1 : indexTeam2;
+
+    matchEntry.querySelector(".team_1_icon").src = `assets/images/teams/team${team1ImageIndex + 1}.png`;
     matchEntry.querySelector(".team_1_name").innerHTML = match.teamA.name;
-    matchEntry.querySelector(".team_2_icon").src = `assets/images/teams/team${indexTeam2 + 1}.png`;
+    matchEntry.querySelector(".team_2_icon").src = `assets/images/teams/team${team2ImageIndex + 1}.png`;
     matchEntry.querySelector(".team_2_name").innerHTML = match.teamB.name;
-    if(match.teamA.name === "BYE round") {
+    if (match.teamA.name === "BYE round") {
         matchEntry.querySelector(".team_1_icon").src = `assets/images/teams/skipped_player.png`;
     }
-    if(match.teamB.name === "BYE round") {
+    if (match.teamB.name === "BYE round") {
         matchEntry.querySelector(".team_2_icon").src = `assets/images/teams/skipped_player.png`;
     }
     const teamAScoreInput = matchEntry.querySelector(".team_1_score");
     const teamBScoreInput = matchEntry.querySelector(".team_2_score");
-    if(match.teamA.name === "BYE round") {
+    if (match.teamA.name === "BYE round") {
         teamAScoreInput.value = "0";
         teamAScoreInput.disabled = true;
         teamBScoreInput.value = "3";
         teamBScoreInput.disabled = true;
     }
-    if(match.teamB.name === "BYE round") {
+    if (match.teamB.name === "BYE round") {
         teamBScoreInput.value = "0";
         teamBScoreInput.disabled = true;
         teamAScoreInput.value = "3";

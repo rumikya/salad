@@ -20,8 +20,14 @@ export function getPairings(recall = false) {
     let remainingTeams = [...teamsCache];
     while (remainingTeams.length >= 2) {
         const match = getPairing(remainingTeams);
+        
+        if(!match.teamB) break;
+
         remainingTeams = remainingTeams.filter(team => 
-            team.players.some(p=> match.teamA.players.some(pa => pa.id === p.id)) === false && (match.teamB ? team.players.some(p=> match.teamB.some(pa => pa.id === p.id)) === false : true));
+            team.players.some(p=> 
+                !match.teamA.players.some(pa => pa.name === p.name)) && 
+                (match.teamB ? !team.players.some(p=> match.teamB.players.some(pa => pa.name === p.name)) : true));
+        
         matches.push(match);
     }
     return matches;
@@ -40,7 +46,7 @@ export function getPairing(availableTeams) {
     for (let i = 0; i < availableTeams.length; i++) {
         const teamB = availableTeams[i];
         // Ensure teamA and teamB are not the same team
-        if (teamA.players.some((p, idx) => teamB.players[idx] && p.id === teamB.players[idx].id)) {
+        if (teamA.players.some((p, idx) => teamB.players.some(p2 => p2.name === p.name))) {
             continue;
         }
         const score = matchSimilarityScore(teamA.players, teamB.players) + Math.abs(getTeamElo(teamA) - getTeamElo(teamB));
@@ -49,6 +55,8 @@ export function getPairing(availableTeams) {
             bestMatchIndex = i;
         }
     }
+
+
     return { teamA, teamB: bestMatchIndex !== -1 ? availableTeams[bestMatchIndex] : null };
 }
 

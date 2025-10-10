@@ -64,7 +64,7 @@ html, body {
     height: 325px;
 }
 
-.team_name {
+.team_name, .skipped_player_text {
     width: 100%;
 }
 
@@ -122,7 +122,7 @@ html, body {
 
 .right_side {
     flex: 1;
-    background: #00000080;
+    background: #000000b2;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -154,10 +154,12 @@ html, body {
     align-items: center;
     width: auto;
     padding: 10px;
-    background-color: white;
-    border-radius: 16px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
     margin: 20px;
     gap: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
 }
 .match_teams {
     display: flex;
@@ -183,7 +185,7 @@ html, body {
     font-weight: bold;
 }
 input.team1_score, input.team2_score {
-    width: 50px;
+    width: 122px;
     font-size: 24px;
     font-weight: bold;
     appearance: none;
@@ -191,7 +193,13 @@ input.team1_score, input.team2_score {
     background: none;
     outline: none;
     box-shadow: none;
+    text-align: center;
 }
+
+input.team2_score {
+    padding-left: 21px;
+}
+
 ::backdrop {
     background: rgba(0, 0, 0, 0.5);
 }
@@ -225,4 +233,51 @@ input.team1_score, input.team2_score {
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
+}
+
+.team1, .team2 {
+    width: 130px;
+}
+
+.separator {
+    width: 22px;
+    text-align: center;
+}
+
+.action_button {
+    background-color: white;
+    padding: 0;
+}
+
+.action_button img {
+    height: 100%;
+}
+
+.buttons_container {
+    width: 100%;
+    height: fit-content;
+    justify-content: center;
+}
+
+
+#clear_results_button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4c56af;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+#clear_results_button:hover {
+    background-color: #3b478a;
+}
+
+#close_result_modal {
+    transition: color 0.2s;
+}
+
+#close_result_modal:hover {
+    color: red;
 }
