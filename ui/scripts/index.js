@@ -25,6 +25,21 @@ import_button.addEventListener("click", function () {
     file_input.click(); 
 });
 
+generate_button.addEventListener("click", function() {
+    const header = "name,role,elo,win,participation,salad_elo";
+    const body = players.map(player => `${player.name},${player.role},${player.elo},${player.win},${player.participation},${player.salad_elo}`).join("\n");
+    const content = `${header}\n${body}`
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'database.txt';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+})
+
 function handleFileSelect(event) {
     const file = event.target.files[0];
     const reader = new FileReader();

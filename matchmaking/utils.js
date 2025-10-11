@@ -44,7 +44,7 @@ export function getAllUniqueTeams(players) {
     // Filter teams: max 1 goalie, at least 1 flex or goalie
     const filteredTeams = goalieCount >= teamCount ? teams.filter(team => {
         const teamGoalieCount = team.players.filter(x => x.role === "Guardian").length;
-        return teamGoalieCount >= 1;
+        return (goalieCount == teamCount) ? teamGoalieCount === 1  : teamGoalieCount >= 1;
     }) : teams.filter(team => {
         const teamGoalieCount = team.players.filter(x => x.role === "Guardian").length;
         return teamGoalieCount <= 1 || (notEnoughGoalie && teamGoalieCount < 2);

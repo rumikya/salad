@@ -34,7 +34,7 @@ export function getPairings(recall = false) {
   let usedPlayers = new Set();
   const elo_threshold = std_dev_elo * 0.25; // Adjust this multiplier to make matchmaking stricter or more lenient
   let remainingTeams = teamsCache[0];
-  console.log(remainingTeams.length)
+  console.log(remainingTeams.length);
   console.log(
     `Average Elo: ${average_elo}, Std Dev: ${std_dev_elo}, Elo Threshold: ${elo_threshold}`
   );
@@ -49,17 +49,19 @@ export function getPairings(recall = false) {
     );
 
     if (!match) {
-      console.info("Rerolling!")
+      console.info("Rerolling!");
       if (rerollCount >= rerollLimit) {
         console.warn("Reroll limit reached, stopping matchmaking.");
         break;
       }
       if (matches.length > 0) {
         const lastMatch = matches.pop();
+        remainingTeams = teamsCache[matches.length];
         lastMatch.teamA.players.forEach((p) => usedPlayers.delete(p.name));
         lastMatch.teamB.players.forEach((p) => usedPlayers.delete(p.name));
-        remainingTeams = teamsCache[matches.length];
-        console.info("Added teams back! " + remainingTeams.length + " " + usedPlayers.size);
+        console.info(
+          "Added teams back! " + remainingTeams.length + " " + usedPlayers.size
+        );
       } else {
         rerollCount++;
         console.info(`Reroll count ${rerollCount}`);
@@ -69,11 +71,10 @@ export function getPairings(recall = false) {
 
     match.teamA.players.forEach((p) => usedPlayers.add(p.name));
     match.teamB.players.forEach((p) => usedPlayers.add(p.name));
-    remainingTeams = remainingTeams.filter(
-      (team) => {
-        return team.players.every((p) => !usedPlayers.has(p.name))
+    remainingTeams = remainingTeams.filter((team) => {
+      return team.players.every((p) => !usedPlayers.has(p.name));
     });
-    console.log(remainingTeams.length)
+    console.log(remainingTeams.length);
     matches.push(match);
     teamsCache[matches.length] = remainingTeams;
   }
