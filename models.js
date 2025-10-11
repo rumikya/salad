@@ -4,7 +4,7 @@ import * as Types from './types.js';
  */
 const RanksString = [ "rookie" , "iron" , "bronze" , "silver" , "gold" , "platinum" , "diamond" , "challenger" , "omega" , "pro_league" ]
 /**
- * @enum {string}
+ * @enum {"Guardian"| "Forward"|"Flex"} Roles
  */
 const Roles = [ "Guardian", "Forward", "Flex"]
 
@@ -65,6 +65,20 @@ function databaseRoleToRole(role) {
         case "flex":
         case "remplaçant":
             return "Flex";
+    }
+}
+
+export function databaseRoleToSortIndex(role) {
+        switch(role.toLowerCase()) {
+        case "gardien":
+        case "guardian":
+            return 3;
+        case "attaquant":
+        case "forward":
+            return 1;
+        case "flex":
+        case "remplaçant":
+            return 2;
     }
 }
 

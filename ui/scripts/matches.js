@@ -1,4 +1,4 @@
-import { playerCache, eloToRank } from "../../models.js";
+import { playerCache, eloToRank, databaseRoleToSortIndex } from "../../models.js";
 import * as matchmaking from "../../matchmaking/index.js";
 import { getWinningPlayers, resetWinHistory, setWinner } from "../../caches.js";
 
@@ -105,6 +105,15 @@ const regenTeams = {
 }
 
 const players = playerCache;
+
+const playerList = players.filter(p => p.isActive);
+player_count_value.textContent = playerList.length;
+goalie_count_value.textContent = playerList.filter(x => x.role === "Guardian").length
+flex_count_value.textContent = playerList.filter(x => x.role === "Flex").length
+forward_count_value.textContent = playerList.filter(x => x.role === "Forward").length
+average_elo.textContent = playerList.map(p => {
+    return p.rank
+}).reduce((acc, value) => acc + value, 0) / playerList.length
 /**
  * @type {Array<import("../../types.js").Team>}
  */
@@ -233,10 +242,15 @@ function createTeam(team) {
     teamEntry.querySelector('.average_rank_icon').src = 'assets/images/ranks/' + eloToRank(averageElo) + '.png'
 
 
-    teamEntry.querySelectorAll('.player_entry').forEach((entry, index) => {
-        entry.querySelector('.player_name').innerHTML = team.players[index].name
-        entry.querySelector('.player_rank').src = 'assets/images/ranks/' + eloToRank(team.players[index].rank) + '.png'
 
+    const playersSorted = team.players.toSorted((a, b) => {
+        return databaseRoleToSortIndex(b.role) - databaseRoleToSortIndex(a.role);
+    })
+
+    teamEntry.querySelectorAll('.player_entry').forEach((entry, index) => {
+        entry.querySelector('.player_name').innerHTML = playersSorted[index].name
+        entry.querySelector('.player_rank').src = 'assets/images/ranks/' + eloToRank(playersSorted[index].rank) + '.png'
+        entry.querySelector('.player_name').textContent += " " + playersSorted[index].role.toUpperCase();
     })
 
     team_list.appendChild(teamEntry);

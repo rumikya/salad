@@ -1,5 +1,5 @@
 import { setPlayers } from "../../caches.js";
-import { eloToRank, databaseRoleToRole } from "../../models.js";
+import { eloToRank, databaseRoleToRole, databaseRoleToSortIndex } from "../../models.js";
 // name,role,elo,win,participation,salad_elo
 let players = [];
 let eloMode = "salad_elo"; // or elo
@@ -238,6 +238,19 @@ document.getElementsByName("type").forEach(radio => {
 
 function setPlayerCount() {
     player_count_value.textContent = document.querySelectorAll(".player_entry").length;
+
+    let eloKey = "elo";
+    if(eloMode == "salad_elo") {
+        eloKey = "salad_elo";
+    }
+
+    const playerList = getPlayerList();
+    goalie_count_value.textContent = playerList.filter(x => databaseRoleToSortIndex(x.role) === 3).length
+    flex_count_value.textContent = playerList.filter(x => databaseRoleToSortIndex(x.role) === 2).length
+    forward_count_value.textContent = playerList.filter(x => databaseRoleToSortIndex(x.role) === 1).length
+    average_elo.textContent = playerList.map(p => {
+        return players.find(t => t.name === p.name && t.role === p.role)[eloKey]
+    }).reduce((acc, value) => acc + value, 0) / playerList.length
 }
 
 
@@ -247,7 +260,7 @@ start_button.addEventListener("click", function() {
         eloKey = "salad_elo";
     }
 
-    const activePlayers = JSON.parse(sessionStorage.getItem('playersList')).map(p => ({
+    const activePlayers = getPlayerList().map(p => ({
         name: p.name,
         rank: players.find(t => t.name === p.name && t.role === p.role)[eloKey],
         role: databaseRoleToRole(p.role),
@@ -261,3 +274,7 @@ start_button.addEventListener("click", function() {
 to_database_button.addEventListener("click", function() {
     window.location.href = "database.html";
 });
+
+function getPlayerList() {
+    return JSON.parse(sessionStorage.getItem('playersList'))
+}

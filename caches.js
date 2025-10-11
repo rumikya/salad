@@ -27,7 +27,7 @@ export function setPlayers(players, mode) {
         });
         const mergedPlayers = players.map(player => {
             const cached = playerCache.find(p => p.name === player.name);
-            return { ...player, ...(cached || {}) };
+            return { ...(cached || {}), ...player };
         });
         sessionStorage.setItem('playerCache', JSON.stringify(mergedPlayers));
         return;
