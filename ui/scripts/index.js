@@ -1,4 +1,4 @@
-import { setPlayers } from "../../caches.js";
+import { resetWinHistory, setPlayers } from "../../caches.js";
 import { eloToRank, databaseRoleToRole, databaseRoleToSortIndex } from "../../models.js";
 // name,role,elo,win,participation,salad_elo
 let players = [];
@@ -54,6 +54,9 @@ function handleFileSelect(event) {
 
 function processCSV(data) {
     const lines = data.split("\n");
+    /**
+     * @type {Array<{name: string, role: string, elo: number, win: number, participation: number, salad_elo: number}>}
+     */
     const newPlayers = [];
     for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
@@ -69,7 +72,7 @@ function processCSV(data) {
             });
         }
     }
-    
+    newPlayers.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     players = newPlayers;
 
     localStorage.setItem('databaseCache', JSON.stringify(players));
@@ -101,6 +104,10 @@ add_random_players.addEventListener("click", function() {
     createPlayerEntry({name: randomName, role: player.role});
 })
 
+start_tournament.addEventListener("click", function() {
+    resetWinHistory();
+    start_button.click();
+})
 
 function createPlayerEntry(player = {name: "", role: "Flex"}) {
     /**

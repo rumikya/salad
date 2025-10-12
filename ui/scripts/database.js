@@ -197,7 +197,7 @@ edit_player_button.addEventListener("click", function() {
         sp.name = p.name;
         sp.role = p.role;
     });
-
+    saved_players.sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     sessionStorage.setItem('playersList', JSON.stringify(saved_players));
     window.location.href = "index.html";
 })

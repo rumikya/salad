@@ -8,7 +8,7 @@
 
 .main {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     justify-content: space-between;
     width: 100vw;
 }
@@ -98,7 +98,26 @@ button:hover {
     background: white;
     border: 1px solid black;
     padding: 0;
-} 
+}
+.tournament_controls{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.middle_side {
+    width: 100%;
+}
+
+#start_tournament {
+    img {
+        width: 10dvw;
+    }
+}
 
 .image_button:hover {
     background: #e0e0e0;
@@ -164,4 +183,3 @@ button:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     width: 300px;
 }
-

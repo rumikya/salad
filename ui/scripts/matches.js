@@ -2,7 +2,7 @@ import { playerCache, eloToRank, databaseRoleToSortIndex } from "../../models.js
 import * as matchmaking from "../../matchmaking/index.js";
 import { getWinningPlayers, resetWinHistory, setWinner } from "../../caches.js";
 //@ts-ignore
-import Sortable, {Swap} from 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/modular/sortable.core.esm.js'
+import Sortable, { Swap } from 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/modular/sortable.core.esm.js'
 
 
 Sortable.mount(new Swap());
@@ -38,7 +38,7 @@ const matchList = [];
  */
 const sortables = [];
 
-let modalCloseCallback = function(){};
+let modalCloseCallback = function () { };
 
 function convertTeams(players) {
     const teams = players.map((team, index) => ({
@@ -62,7 +62,7 @@ function getTeams100(teams) {
         get removedPlayers() {
             const players = teams.flatMap(x => x.players)
             console.log(players.length)
-            const skipped = playerCache.filter(x => x.isActive && !players.some(player => player.name === x.name)); 
+            const skipped = playerCache.filter(x => x.isActive && !players.some(player => player.name === x.name));
             return skipped
         }
     }
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             createSkippedPlayersEntry(teams.removedPlayers);
         }
     }
-    result_modal.addEventListener('click', function(event) {
+    result_modal.addEventListener('click', function (event) {
         const rect = result_modal.getBoundingClientRect();
         const isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
             rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
@@ -229,6 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
         resetWinHistory();
     });
     edit_button.addEventListener('click', () => {
+        if (matchList.some(m => m.teamAScore > 0 || m.teamBScore > 0)) {
+            if (!confirm("Des résultats ont déjà été entrés pour ce tour. En éditant les équipes, vous perdrez ces résultats. Continuer?")) {
+                return;
+            }
+        }
         window.location.href = "index.html";
     })
 
@@ -354,11 +359,11 @@ function createMatch(match) {
     }
     document.getElementById("match_list").appendChild(matchEntry);
     matchList.push(
-         { 
-            match, 
-            get teamAScore() { return parseInt(teamAScoreInput.value) || 0 }, 
-            get teamBScore() { return parseInt(teamBScoreInput.value) || 0 } 
-        } 
+        {
+            match,
+            get teamAScore() { return parseInt(teamAScoreInput.value) || 0 },
+            get teamBScore() { return parseInt(teamBScoreInput.value) || 0 }
+        }
     );
 }
 /**
