@@ -32,12 +32,12 @@ export function getPairings(recall = false) {
    * @type {Set<Types.Player>}
    */
   let usedPlayers = new Set();
-  const elo_threshold = std_dev_elo * 0.25; // Adjust this multiplier to make matchmaking stricter or more lenient
+  const elo_threshold = calculateEloThreshold(
+    average_elo,
+    std_dev_elo,
+    models.playerCache.length
+  ); // Adjust this multiplier to make matchmaking stricter or more lenient
   let remainingTeams = teamsCache[0];
-  console.log(remainingTeams.length);
-  console.log(
-    `Average Elo: ${average_elo}, Std Dev: ${std_dev_elo}, Elo Threshold: ${elo_threshold}`
-  );
   const rerollLimit = 100; // Limit to prevent infinite loops
   let rerollCount = 0;
   while (remainingTeams.length >= 2) {
@@ -122,32 +122,6 @@ export function getPairing(
   return { teamA, teamB: availableTeams[bestMatchIndex] };
 }
 
-// /**
-//  *
-//  * @param {Array<Types.Team>} availableTeams
-//  * @returns {Types.Match}
-//  */
-// export function getPairing(availableTeams) {
-//     const randomIndex = Math.floor(Math.random() * availableTeams.length);
-//     const teamA = availableTeams.splice(randomIndex, 1)[0];
-//     let bestMatchIndex = -1;
-//     let bestMatchScore = Infinity;
-//     for (let i = 0; i < availableTeams.length; i++) {
-//         const teamB = availableTeams[i];
-//         // Ensure teamA and teamB are not the same team
-//         if (teamA.players.some((p, idx) => teamB.players.some(p2 => p2.name === p.name))) {
-//             continue;
-//         }
-//         const score = matchSimilarityScore(teamA.players, teamB.players) + Math.abs(getTeamElo(teamA) - getTeamElo(teamB));
-//         if (score < bestMatchScore) {
-//             bestMatchScore = score;
-//             bestMatchIndex = i;
-//         }
-//     }
-
-//     return { teamA, teamB: bestMatchIndex !== -1 ? availableTeams[bestMatchIndex] : null };
-// }
-
 function matchSimilarityScore(teamA, teamB) {
   const similarityPenalty = 0;
   let score = 0;
@@ -167,4 +141,15 @@ function matchSimilarityScore(teamA, teamB) {
     }
   });
   return score;
+}
+
+function calculateEloThreshold(averageElo, stdDevElo, playerCount) {
+  const baseThreshold = stdDevElo * 0.5; // Adjust multiplier as needed
+  const adjustmentFactor = 1 + (15 - playerCount) / 20;
+  console.log(
+    `Elo Threshold: ${baseThreshold} * ${adjustmentFactor} = ${
+      baseThreshold * adjustmentFactor
+    }`
+  ); // --- IGNORE ---
+  return baseThreshold * adjustmentFactor;
 }
