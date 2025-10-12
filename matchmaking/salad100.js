@@ -29,7 +29,7 @@ export function getPairings(recall = false) {
       models.playerCache.filter((p) => p.isActive).length
   );
   /**
-   * @type {Set<Types.Player>}
+   * @type {Set<string>}
    */
   let usedPlayers = new Set();
   const elo_threshold = calculateEloThreshold(
@@ -40,6 +40,7 @@ export function getPairings(recall = false) {
   let remainingTeams = teamsCache[0];
   const rerollLimit = 100; // Limit to prevent infinite loops
   let rerollCount = 0;
+  let rerollDepth = 0;
   while (remainingTeams.length >= 2) {
     const match = getPairing(
       [...remainingTeams],
@@ -54,15 +55,25 @@ export function getPairings(recall = false) {
         console.warn("Reroll limit reached, stopping matchmaking.");
         break;
       }
-      if (matches.length > 0) {
-        const lastMatch = matches.pop();
-        remainingTeams = teamsCache[matches.length];
-        lastMatch.teamA.players.forEach((p) => usedPlayers.delete(p.name));
-        lastMatch.teamB.players.forEach((p) => usedPlayers.delete(p.name));
+      if (matches.length > rerollDepth) {
+        for (let i = 0; i < rerollDepth; i++) {
+
+          /** @type {Types.Match} */
+          // @ts-ignore
+          const lastMatch = matches.pop();
+          remainingTeams = teamsCache[matches.length];
+          lastMatch.teamA.players.forEach((p) => usedPlayers.delete(p.name));
+          lastMatch.teamB.players.forEach((p) => usedPlayers.delete(p.name));
+        }
+        rerollDepth++;
         console.info(
           "Added teams back! " + remainingTeams.length + " " + usedPlayers.size
         );
       } else {
+        remainingTeams = teamsCache[0];
+        usedPlayers.clear();
+        matches.length = 0;
+        rerollDepth = 0;
         rerollCount++;
         console.info(`Reroll count ${rerollCount}`);
       }
@@ -87,6 +98,9 @@ export function getPairings(recall = false) {
  *
  * @param {Array<Types.Team>} availableTeams
  * @returns {Types.Match | undefined}
+ * @param {number} average_elo
+ * @param {number} std_dev_elo
+ * @param {number} elo_threshold
  */
 export function getPairing(
   availableTeams,
@@ -117,13 +131,20 @@ export function getPairing(
       bestMatchScore = score;
       bestMatchIndex = i;
     }
+    
+    if(score === 0) break; // Perfect match found
   }
   if (bestMatchIndex === -1) return undefined;
   return { teamA, teamB: availableTeams[bestMatchIndex] };
 }
 
+/**
+ * @param {Array<Types.Player>} teamA
+ * @param {Array<Types.Player>} teamB
+ * @returns {number}
+ */
 function matchSimilarityScore(teamA, teamB) {
-  const similarityPenalty = 0;
+  const similarityPenalty = 50;
   let score = 0;
   matchHistory.forEach((match) => {
     const teamAIds = teamA.map((player) => player.name);
@@ -143,13 +164,19 @@ function matchSimilarityScore(teamA, teamB) {
   return score;
 }
 
+/**
+ * @param {number} averageElo
+ * @param {number} stdDevElo
+ * @param {number} playerCount
+ * @returns {number}
+ */
 function calculateEloThreshold(averageElo, stdDevElo, playerCount) {
   const baseThreshold = stdDevElo * 0.5; // Adjust multiplier as needed
-  const adjustmentFactor = 1 + (15 - playerCount) / 20;
+  const adjustmentFactor = Math.max(1 + (15 - playerCount) / 20, 0.10);
   console.log(
     `Elo Threshold: ${baseThreshold} * ${adjustmentFactor} = ${
       baseThreshold * adjustmentFactor
     }`
-  ); // --- IGNORE ---
+  );
   return baseThreshold * adjustmentFactor;
 }

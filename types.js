@@ -23,20 +23,6 @@
 */
 
 /**
- * @typedef {Object} PlayerHistory
- * @property {Player} player
- * @property {number} wins
- */
-
-
-/**
- * @typedef {Object} MatchHistoryEntry
- * @property {Match} match
- * @property {Team} winningTeam
- */
-
-
-/**
- * @typedef {MatchHistoryEntry[]} WinHistory
+ * @typedef {Array<{match: Match, winningTeam: Team}>} WinHistory
  */
 export { };
