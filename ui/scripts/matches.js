@@ -1,12 +1,17 @@
 import { playerCache, eloToRank, databaseRoleToSortIndex } from "../../models.js";
 import * as matchmaking from "../../matchmaking/index.js";
 import { getWinningPlayers, resetWinHistory, setWinner } from "../../caches.js";
+//@ts-ignore
+import Sortable, {Swap} from 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/modular/sortable.core.esm.js'
+
+
+Sortable.mount(new Swap());
 
 
 /**
- * @callback getScoreCallback
- * @returns {{match: import("../../types.js").Match, teamAScore: number, teamBScore: number}}
+ * @type {Array<'teamA' | 'teamB'>}
  */
+const sides = ['teamA', 'teamB'];
 const teamNames = [
     "FrostFire",
     "Ember Monarchs",
@@ -17,10 +22,21 @@ const teamNames = [
     "Demon Drive",
     "AimiTank"
 ]
+
 /**
- * @type {getScoreCallback[]}
+ * @typedef {{match: import("../../types.js").Match, teamAScore: number, teamBScore: number}} MatchListMatch
+ */
+
+/**
+ * @type {MatchListMatch[]}
  */
 const matchList = [];
+
+
+/**
+ * @type {{destroy: () => void}[]}
+ */
+const sortables = [];
 
 let modalCloseCallback = function(){};
 
@@ -130,16 +146,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init(matches)
 
+    /**
+     * @param {import("../../types.js").Match[]} matches
+     */
     function init(matches) {
-        playerTeams = matches.flatMap(m => [m.teamA, m.teamB]).sort((a, b) => {
-            return getTeamIndex(a) - getTeamIndex(b);
-        });
 
+        sortables.forEach(sortable => {
+            sortable.destroy();
+        })
         team_list.innerHTML = '';
         match_list.innerHTML = '';
-        playerTeams.forEach((team) => {
-            if (team.name === "BYE round") return;
-            createTeam(team);
+        matches.forEach(match => createMatch(match));
+        matches.forEach((match, i) => {
+
+            for (const key of sides) {
+                if (match[key].name === "BYE round") continue;
+                createTeam(match[key], i, key);
+            }
         });
         if (matches.length == 0) {
             next_button.disabled = true;
@@ -147,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (teams.removedPlayers && teams.removedPlayers.length != 0) {
             createSkippedPlayersEntry(teams.removedPlayers);
         }
-        matches.forEach(match => createMatch(match));
     }
     result_modal.addEventListener('click', function(event) {
         const rect = result_modal.getBoundingClientRect();
@@ -159,8 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     next_button.addEventListener('click', () => {
-        for (const matchFunc of matchList) {
-            const { match, teamAScore, teamBScore } = matchFunc();
+        for (const { match, teamAScore, teamBScore } of matchList) {
             setWinner(match, teamAScore > teamBScore ? match.teamA : match.teamB);
         }
         matchList.length = 0;
@@ -219,8 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * 
  * @param {import("../../types.js").Team} team 
+ * @param {number} matchIndex
+ * @param {'teamA' | 'teamB'} teamSide
  */
-function createTeam(team) {
+function createTeam(team, matchIndex, teamSide) {
     const teamTemplate = document.getElementById("team_template");
     /**
      * @type {DocumentFragment}
@@ -238,9 +261,17 @@ function createTeam(team) {
 
     teamEntry.querySelector('.team_background').src = `assets/images/teams/team${index + 1}.png`;
     teamEntry.querySelector('.team_name_name').innerHTML = `${team.name}`
-    teamEntry.querySelector('.average_rank').innerHTML = `${Math.floor(averageElo)}`
-    teamEntry.querySelector('.average_rank_icon').src = 'assets/images/ranks/' + eloToRank(averageElo) + '.png'
 
+    /**
+     * 
+     * @param {number} averageElo 
+     */
+    function renderTeamElo(averageElo) {
+        teamEntry.querySelector('.average_rank').innerHTML = `${Math.floor(averageElo)}`
+        teamEntry.querySelector('.average_rank_icon').src = 'assets/images/ranks/' + eloToRank(averageElo) + '.png'
+    }
+
+    renderTeamElo(averageElo);
 
 
     const playersSorted = team.players.toSorted((a, b) => {
@@ -251,10 +282,31 @@ function createTeam(team) {
         entry.querySelector('.player_name').innerHTML = playersSorted[index].name
         entry.querySelector('.player_rank').src = 'assets/images/ranks/' + eloToRank(playersSorted[index].rank) + '.png'
         entry.querySelector('.player_name').textContent += " " + playersSorted[index].role.toUpperCase();
+        entry.setAttribute('data-id', playersSorted[index].name);
     })
+
+    sortables.push(Sortable.create(teamEntry.querySelector('.player_list'), {
+        dataIdAttr: 'data-id',
+        animation: 150,
+        group: 'shared',
+        swap: true,
+        store: {
+            get: function (sortable) {
+                const team = matchList[matchIndex].match[teamSide];
+                return team.players.map(player => player.name);
+            },
+            set: function (sortable) {
+                const team = matchList[matchIndex].match[teamSide];
+                const newOrder = sortable.toArray();
+                team.players = newOrder.map(name => playerCache.find(p => p.name === name))
+                renderTeamElo(team.players.reduce((acc, player) => acc + player.rank, 0) / 3);
+            }
+        }
+    }));
 
     team_list.appendChild(teamEntry);
 }
+
 
 /**
  * 
@@ -298,13 +350,13 @@ function createMatch(match) {
         teamAScoreInput.disabled = true;
     }
     document.getElementById("match_list").appendChild(matchEntry);
-    matchList.push(() => {
-         return { 
+    matchList.push(
+         { 
             match, 
             get teamAScore() { return parseInt(teamAScoreInput.value) || 0 }, 
             get teamBScore() { return parseInt(teamBScoreInput.value) || 0 } 
         } 
-    });
+    );
 }
 /**
  * 
