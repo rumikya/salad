@@ -199,6 +199,7 @@ edit_player_button.addEventListener("click", function() {
     });
 
     sessionStorage.setItem('playersList', JSON.stringify(saved_players));
+    window.location.href = "index.html";
 })
 
 add_player_button.addEventListener("click", function() {
