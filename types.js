@@ -27,8 +27,16 @@
  * @property {Player} player
  * @property {number} wins
  */
+
+
 /**
- * @typedef {Object} WinHistory
- * @property {Array<PlayerHistory>}  
+ * @typedef {Object} MatchHistoryEntry
+ * @property {Match} match
+ * @property {Team} winningTeam
+ */
+
+
+/**
+ * @typedef {MatchHistoryEntry[]} WinHistory
  */
 export { };
