@@ -4,12 +4,12 @@ import * as Types from './types.js';
 /**
  * @type {Array<Types.Match>}
  */
-export const matchHistory = sessionStorage.getItem('matchHistory') ? JSON.parse(sessionStorage.getItem('matchHistory')) : [];
+export const matchHistory = sessionStorage.getItem('matchHistory') ? JSON.parse(sessionStorage.getItem('matchHistory')||"") : [];
 
 /**
  * @type {Types.WinHistory}
  */
-export let winHistory = sessionStorage.getItem('winHistory') ? JSON.parse(sessionStorage.getItem('winHistory')) : [];
+export let winHistory = sessionStorage.getItem('winHistory') ? JSON.parse(sessionStorage.getItem('winHistory')||"") : [];
 
 /**
  * call this when "randomizer" button is clicked
@@ -47,6 +47,8 @@ export function setWinner(match, winningTeam) {
         winningTeam
     };
     winHistory.push(winEntry);
+    matchHistory.push(match);
+    sessionStorage.setItem('matchHistory', JSON.stringify(matchHistory));
     sessionStorage.setItem('winHistory', JSON.stringify(winHistory));
 }
 

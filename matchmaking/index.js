@@ -22,6 +22,12 @@ export function rerollSalad100Round() {
 export function generateSwissTeams() {
     return generateTeams(models.playerCache);
 }
+
+/**
+ * 
+ * @param {Array<Types.Team>} teams 
+ * @returns 
+ */
 export function generateSwissMatches(teams) {
     return generateMatches(teams);
 }
