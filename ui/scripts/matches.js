@@ -151,9 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function init(matches) {
 
-        sortables.forEach(sortable => {
-            sortable.destroy();
-        })
+        while (sortables.length) {
+            sortables.pop()?.destroy();
+        }
         team_list.innerHTML = '';
         match_list.innerHTML = '';
         matches.forEach(match => createMatch(match));
