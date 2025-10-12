@@ -11,7 +11,10 @@
  */
 
 /**
- * 
+ * @typedef {import('./models.js').Roles} Roles
+ */
+
+/**
  * @typedef {Object} Player
  * @property {string}  name
  * @property {number}  rank
