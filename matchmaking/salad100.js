@@ -1,6 +1,6 @@
 import * as Types from "../types.js";
 import { matchHistory } from "../caches.js";
-import { getTeamElo, getAllUniqueTeams } from "./utils.js";
+import { getTeamElo, getAllUniqueTeams, keepValidTeams } from "./utils.js";
 import * as models from "../models.js";
 /**
  * this should be set once per page load
@@ -74,7 +74,9 @@ export function getPairings(recall = false) {
     remainingTeams = remainingTeams.filter((team) => {
       return team.players.every((p) => !usedPlayers.has(p.name));
     });
+
     console.log(remainingTeams.length);
+    remainingTeams = keepValidTeams(remainingTeams);
     matches.push(match);
     teamsCache[matches.length] = remainingTeams;
   }
@@ -93,19 +95,18 @@ export function getPairing(
   elo_threshold
 ) {
   const randomIndex = Math.floor(Math.random() * availableTeams.length);
-  const teamA = availableTeams.splice(randomIndex, 1)[0];
+  const teamA = availableTeams[randomIndex];
   let bestMatchIndex = -1;
   let bestMatchScore = Infinity;
+  availableTeams = keepValidTeams(
+    availableTeams.filter(
+      (t) =>
+        !t.players.some((p) => teamA.players.some((p2) => p2.name === p.name))
+    )
+  );
+  if (availableTeams.length === 0) return undefined;
   for (let i = 0; i < availableTeams.length; i++) {
     const teamB = availableTeams[i];
-    // Ensure teamA and teamB are not the same team
-    if (
-      teamA.players.some((p, idx) =>
-        teamB.players.some((p2) => p2.name === p.name)
-      )
-    ) {
-      continue;
-    }
     const eloDifference = Math.abs(getTeamElo(teamA) - getTeamElo(teamB));
     if (eloDifference > elo_threshold) {
       continue; // Skip this teamB as the Elo difference is too high
