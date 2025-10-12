@@ -203,11 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return getTeamIndex(a) - getTeamIndex(b);
         });
 
-        playerTeams.forEach((team) => {
-            if (team.name === "BYE round") return;
-            createTeam(team);
-        });
         nextRoundMatches.forEach(match => createMatch(match));
+        nextRoundMatches.forEach((match, index) => {
+            for (const key of sides) {
+                const team = match[key];
+                if (team.name === "BYE round") return;
+                createTeam(team, index, key);
+            }
+        });
 
         if (teams.removedPlayers && teams.removedPlayers.length != 0) {
             createSkippedPlayersEntry(teams.removedPlayers);
