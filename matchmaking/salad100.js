@@ -86,7 +86,6 @@ export function getPairings(recall = false) {
       return team.players.every((p) => !usedPlayers.has(p.name));
     });
 
-    console.log(remainingTeams.length);
     remainingTeams = keepValidTeams(remainingTeams);
     matches.push(match);
     teamsCache[matches.length] = remainingTeams;
@@ -125,13 +124,13 @@ export function getPairing(
     if (eloDifference > elo_threshold) {
       continue; // Skip this teamB as the Elo difference is too high
     }
-    const score =
-      matchSimilarityScore(teamA.players, teamB.players) + eloDifference;
+    const similarity = matchSimilarityScore(teamA.players, teamB.players);
+    const score = similarity + eloDifference;
+    
     if (score < bestMatchScore) {
       bestMatchScore = score;
       bestMatchIndex = i;
     }
-    
     if(score === 0) break; // Perfect match found
   }
   if (bestMatchIndex === -1) return undefined;
@@ -144,7 +143,7 @@ export function getPairing(
  * @returns {number}
  */
 function matchSimilarityScore(teamA, teamB) {
-  const similarityPenalty = 50;
+  const similarityPenalty = 15;
   let score = 0;
   matchHistory.forEach((match) => {
     const teamAIds = teamA.map((player) => player.name);
