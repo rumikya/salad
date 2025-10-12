@@ -298,7 +298,13 @@ function createMatch(match) {
         teamAScoreInput.disabled = true;
     }
     document.getElementById("match_list").appendChild(matchEntry);
-    matchList.push(() => { return { match, get teamScore() { return parseInt(teamAScoreInput.value) || 0 }, teamBScore: parseInt(teamBScoreInput.value) || 0 } });
+    matchList.push(() => {
+         return { 
+            match, 
+            get teamAScore() { return parseInt(teamAScoreInput.value) || 0 }, 
+            get teamBScore() { return parseInt(teamBScoreInput.value) || 0 } 
+        } 
+    });
 }
 /**
  * 
