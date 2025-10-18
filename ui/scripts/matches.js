@@ -282,33 +282,53 @@ function createTeam(team, matchIndex, teamSide) {
     renderTeamElo(averageElo);
 
 
-    const playersSorted = team.players.toSorted((a, b) => {
+
+    team.players = team.players.toSorted((a, b) => {
         return databaseRoleToSortIndex(b.role) - databaseRoleToSortIndex(a.role);
     })
+    const playerList = teamEntry.querySelector('.player_list');
 
-    teamEntry.querySelectorAll('.player_entry').forEach((entry, index) => {
-        entry.querySelector('.player_name').innerHTML = playersSorted[index].name
-        entry.querySelector('.player_rank').src = 'assets/images/ranks/' + eloToRank(playersSorted[index].rank) + '.png'
-        entry.querySelector('.player_name').textContent += " " + playersSorted[index].role.toUpperCase();
-        entry.setAttribute('data-id', playersSorted[index].name);
-    })
+    function createPlayerEntry(player) {
+        const playerTemplate = document.getElementById("player_entry_template");
+        const playerCopy = playerTemplate.content.firstElementChild.cloneNode(true);
+        playerCopy.querySelector('.player_name').innerHTML = player.name;
+        playerCopy.querySelector('.player_rank').src = 'assets/images/ranks/' + eloToRank(player.rank) + '.png';
+        playerCopy.querySelector('.player_name').textContent += " " + player.role.toUpperCase();
+        playerCopy.setAttribute('data-id', player.name);
+        return playerCopy;
+    }
+    team.players.forEach(player => {
+        const playerElement = createPlayerEntry(player);
+        playerList.appendChild(playerElement);
+    });
+    function replaceDraggedElement(draggedElement) {
+        // Dragged element can be a player entry or a skipped player entry
+        const playerName = draggedElement.getAttribute('data-id');
+        const player = playerCache.find(p => p.name === playerName);
+        const playerElement = createPlayerEntry(player);
+        setTimeout(() => 
+        draggedElement.replaceWith(playerElement), 150)
+    }
 
     sortables.push(Sortable.create(teamEntry.querySelector('.player_list'), {
         dataIdAttr: 'data-id',
         animation: 150,
         group: 'shared',
         swap: true,
-        store: {
-            get: function (sortable) {
-                const team = matchList[matchIndex].match[teamSide];
-                return team.players.map(player => player.name);
-            },
-            set: function (sortable) {
-                const team = matchList[matchIndex].match[teamSide];
-                const newOrder = sortable.toArray();
-                team.players = newOrder.map(name => playerCache.find(p => p.name === name))
-                renderTeamElo(team.players.reduce((acc, player) => acc + player.rank, 0) / 3);
-            }
+        onAdd: function (evt) {
+            const teamPlayerNames = Array.from(evt.to.querySelectorAll('.player_entry')).map(entry => entry.getAttribute('data-id'));
+            const teamPlayers = teamPlayerNames.map(name => playerCache.find(p => p.name === name));
+            team.players = teamPlayers;
+            renderTeamElo(team.players.reduce((acc, player) => acc + player.rank, 0) / 3);
+            replaceDraggedElement(evt.item);
+        },
+        onRemove: function (evt) {
+            const addedElement = playerList.children[evt.oldIndex];
+            replaceDraggedElement(addedElement);
+            const teamPlayerNames = Array.from(evt.from.querySelectorAll('.player_entry')).map(entry => entry.getAttribute('data-id'));
+            const teamPlayers = teamPlayerNames.map(name => playerCache.find(p => p.name === name));
+            team.players = teamPlayers;
+            renderTeamElo(team.players.reduce((acc, player) => acc + player.rank, 0) / 3);
         }
     }));
 
@@ -383,13 +403,41 @@ function createSkippedPlayersEntry(players) {
     const skippedTemplate = document.getElementById("skipped_players_template");
     const skippedCopy = document.importNode(skippedTemplate.content, true);
     const skippedList = skippedCopy.getElementById("skipped_player_list");
-    players.forEach(player => {
+
+    function createSkippedPlayer(player) {
         const playerEntry = document.createElement("p");
+        playerEntry.setAttribute('data-id', player.name);
         playerEntry.classList.add("player_name");
         playerEntry.innerHTML = player.name;
+        return playerEntry;
+    }
+    players.forEach(player => {
+        const playerEntry = createSkippedPlayer(player);
         skippedList.appendChild(playerEntry);
     });
     team_list.appendChild(skippedCopy);
+
+    function replaceDraggedElement(draggedElement) {
+        // Dragged element can be a player entry or a skipped player entry
+        const playerName = draggedElement.getAttribute('data-id');
+        const player = playerCache.find(p => p.name === playerName);
+        const playerElement = createSkippedPlayer(player);
+        setTimeout(() => 
+        draggedElement.replaceWith(playerElement), 150)
+    }
+    sortables.push(Sortable.create(skippedList, {
+        animation: 150,
+        group: 'shared',
+        swap: true,
+        dataIdAttr: 'data-id',
+        onAdd: function (evt) {
+            replaceDraggedElement(evt.item);
+        },
+        onRemove: function (evt) {
+            const addedElement = skippedList.children[evt.oldIndex];
+            replaceDraggedElement(addedElement);
+        }
+    }));
 }
 
 function closeResultModal() {
