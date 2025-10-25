@@ -34,7 +34,7 @@ const matchList = [];
 
 if(location.hostname !== "localhost")
 {
-    document.querySelector('.player_count_container').style.display = 'none';
+    document.querySelector('.player_count').style.display = 'none';
 }
 /**
  * @type {{destroy: () => void}[]}
