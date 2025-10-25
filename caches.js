@@ -54,7 +54,7 @@ export function setWinner(match, winningTeam) {
 
 /**
  * 
- * @returns {{player:Types.Player, wins: number}[]}
+ * @returns  {{winners:{player:Types.Player, wins: number}[], runnersUp:{player:Types.Player, wins: number}[]}}
  */
 export function getWinningPlayers() {
     /**
@@ -78,7 +78,9 @@ export function getWinningPlayers() {
     })
     players.sort((a,b)=>b.wins-a.wins);
     let maxWin = players[0].wins;
-    return players.filter(player => player.wins == maxWin)
+    const winners = players.filter(p => p.wins === maxWin);
+    const runnersUp = players.filter(p => p.wins === maxWin -1);
+    return { winners, runnersUp };
 }
 
 export function resetWinHistory() {

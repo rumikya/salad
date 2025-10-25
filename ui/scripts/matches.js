@@ -221,7 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const resultsContainer = document.getElementById("results_container");
         resultsContainer.innerHTML = '';
         const winningPlayers = getWinningPlayers();
-        winningPlayers.forEach(winningPlayer => createWinEntry(winningPlayer.player, winningPlayer.wins));
+        winningPlayers.winners.forEach(winningPlayer => createWinEntry(winningPlayer.player, winningPlayer.wins));
+        if (winningPlayers.runnersUp.length > 0) {
+            const runnerUpHeader = document.createElement("h2");
+            runnerUpHeader.textContent = "Runners-Up";
+            resultsContainer.appendChild(runnerUpHeader);
+            winningPlayers.runnersUp.forEach(runnerUpPlayer => createWinEntry(runnerUpPlayer.player, runnerUpPlayer.wins));
+        }
     });
     close_result_modal.addEventListener('click', closeResultModal);
     clear_results_button.addEventListener('click', () => {
