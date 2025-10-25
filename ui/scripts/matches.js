@@ -375,6 +375,8 @@ function createMatch(match) {
     }
     const teamAScoreInput = matchEntry.querySelector(".team_1_score");
     const teamBScoreInput = matchEntry.querySelector(".team_2_score");
+    matchEntry.querySelector(".team_1_score").value = "0";
+    matchEntry.querySelector(".team_2_score").value = "0";
     if (match.teamA.name === "BYE round") {
         teamAScoreInput.value = "0";
         teamAScoreInput.disabled = true;
