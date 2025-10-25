@@ -44,7 +44,7 @@ html, body {
     align-items: center;
     height: 100%;
     padding: 3em;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .team_container {
