@@ -181,6 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     next_button.addEventListener('click', () => {
+        if(matchList.some(m => m.teamAScore == 0 && m.teamBScore == 0)) {
+            alert("Please enter scores for all matches before proceeding to the next round.");
+            return;
+        }
         for (const { match, teamAScore, teamBScore } of matchList) {
             setWinner(match, teamAScore > teamBScore ? match.teamA : match.teamB);
         }
