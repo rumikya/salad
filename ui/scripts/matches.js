@@ -32,7 +32,10 @@ const teamNames = [
  */
 const matchList = [];
 
-
+if(location.hostname !== "localhost")
+{
+    document.querySelector('.player_count_container').style.display = 'none';
+}
 /**
  * @type {{destroy: () => void}[]}
  */
