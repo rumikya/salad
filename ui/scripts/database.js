@@ -186,19 +186,19 @@ edit_player_button.addEventListener("click", function() {
         const originalRole = entry.dataset.role;
         const elo = parseInt(entry.querySelector(".original_elo").firstElementChild.value) || 1200;
         const salad_elo = parseInt(entry.querySelector(".salad_elo").firstElementChild.value) || 1200;
-        return { ...players.find(p => p.name === originalName && p.role === originalRole), name, role, elo, salad_elo };
+        return { ...players.find(p => p.name === originalName && p.role === originalRole), name, role, elo, salad_elo, originalRole, originalName };
     });
 
     players = newPlayers;
     localStorage.setItem('databaseCache', JSON.stringify(players));
     
-    newPlayers.filter(x => saved_players.some(p => p.name === x.name)).forEach(p => {
-        const sp = saved_players.find(sp => sp.name === p.name);
+    newPlayers.filter(x => saved_players.find(p => p.name == x.originalName && p.role === x.originalRole)).forEach(p => {
+        const sp = saved_players.find(sp => sp.name === p.originalName && sp.role === p.originalRole);
         sp.name = p.name;
         sp.role = p.role;
     });
     saved_players.sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-    sessionStorage.setItem('playersList', JSON.stringify(saved_players));
+    sessionStorage.setItem('playersList', JSON.stringify(saved_players.filter(x => x.name !== '' || x.role !== '')));
     window.location.href = "index.html";
 })
 
