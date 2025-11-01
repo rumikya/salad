@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {import("../../types.js").Match[]} matches
      */
     function init(matches) {
-
+        matchList.length = 0;
         while (sortables.length) {
             sortables.pop()?.destroy();
         }
