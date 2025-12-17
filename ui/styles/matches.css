@@ -119,6 +119,7 @@ html, body {
     width: 75%;
     height: 100%;
     overflow-y: auto;
+    position: relative;
 }
 
 .right_side {
@@ -300,4 +301,27 @@ input.team2_score {
     font-weight: bold;
     margin: 10px;
     height: fit-content;
+}
+
+#match_id {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20px;
+    padding: 5px;
+}
+
+.pretty_button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4c56af;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.pretty_button:hover {
+    background-color: #3b478a;
 }

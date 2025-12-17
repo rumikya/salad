@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salade Matches</title>
-    <script type="module" src="ui/scripts/matches.js" defer></script>
+    <script src="console.js"></script>
+    <script type="module" src="ui/scripts/history.js" defer></script>
     <link rel="stylesheet" href="ui/styles/matches.css">
 </head>
 
@@ -14,6 +15,9 @@
     <div class="main">
 
         <div class="left_side">
+        <select id="match_id">
+
+        </select>
         <p class="player_count">
                 Nombre de joueurs:     <span id="player_count_value">0</span> <br/>
                 Nombre de gardiens:    <span id="goalie_count_value">0</span> <br/>
@@ -22,6 +26,7 @@
                 Average Elo:           <span id="average_elo">0</span> <br/>
         </p>
             <div id="team_list">
+                
 
             </div>
             <template id="skipped_players_template">
@@ -87,15 +92,10 @@
                 </div>
             </template>
             <div class="buttons_container">
-                <button id="next_button" class="action_button"><img src="assets/images/buttons/next_round_v2.png"
-                        alt="Next"></button>
-                <button id="result_button" class="action_button"><img src="assets/images/buttons/results_icon_v2.png"
-                        alt="Result"></button>
-                <button id="edit_button" class="action_button"><img src="assets/images/buttons/modify_button.png"
-                        alt="Edit"></button>
+                <button id="next_button" class="pretty_button">Sauvegarder</button>
+                <button id="result_button" class="pretty_button">Résultats</button>
+                <button id="home_button" class="pretty_button" onclick="window.location.href = 'index.html'">Retour à l'accueil</button>
 
-                <button id="reroll_button" class="action_button"><img src="assets/images/buttons/update.png"
-                    alt="Update"></button>
             </div>
         </div>
     </div>
@@ -105,9 +105,7 @@
             <h2>Gagnants</h2>
             <div class="results_container" id="results_container">
             </div>
-            <button id="clear_results_button">Réinitialiser les résultats</button>
-            <button id="history_button" class="pretty_button" onclick="window.location.href = 'history.html'">Historique</button>
-
+            
         </div>
     </dialog>
     <template id="winner_template">

@@ -188,6 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Please enter scores for all matches before proceeding to the next round.");
             return;
         }
+
+        const matchHistory = JSON.parse(sessionStorage.getItem("scoreHistory")) || [];
+        matchHistory.push(matchList.map(({match, teamAScore, teamBScore}) => ({ match, teamAScore, teamBScore })));
+        sessionStorage.setItem("scoreHistory", JSON.stringify(matchHistory));
+        
         for (const { match, teamAScore, teamBScore } of matchList) {
             setWinner(match, teamAScore > teamBScore ? match.teamA : match.teamB);
         }
