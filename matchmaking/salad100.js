@@ -2,6 +2,7 @@ import * as Types from "../types.js";
 import { matchHistory } from "../caches.js";
 import { getTeamElo, getAllUniqueTeams, keepValidTeams } from "./utils.js";
 import * as models from "../models.js";
+import { logger } from "../logger.js";
 /**
  * this should be set once per page load
  * @type {Array<Array<Types.Team>>}
@@ -50,9 +51,9 @@ export function getPairings(recall = false) {
     );
 
     if (!match) {
-      console.info("Rerolling!");
+      logger.info("Rerolling!");
       if (rerollCount >= rerollLimit) {
-        console.warn("Reroll limit reached, stopping matchmaking.");
+        logger.warn("Reroll limit reached, stopping matchmaking.");
         break;
       }
       if (matches.length > rerollDepth) {
@@ -66,7 +67,7 @@ export function getPairings(recall = false) {
           lastMatch.teamB.players.forEach((p) => usedPlayers.delete(p.name));
         }
         rerollDepth++;
-        console.info(
+        logger.info(
           "Added teams back! " + remainingTeams.length + " " + usedPlayers.size
         );
       } else {
@@ -75,7 +76,7 @@ export function getPairings(recall = false) {
         matches.length = 0;
         rerollDepth = 0;
         rerollCount++;
-        console.info(`Reroll count ${rerollCount}`);
+        logger.info(`Reroll count ${rerollCount}`);
       }
       continue;
     }
@@ -172,7 +173,7 @@ function matchSimilarityScore(teamA, teamB) {
 function calculateEloThreshold(averageElo, stdDevElo, playerCount) {
   const baseThreshold = stdDevElo * 0.5; // Adjust multiplier as needed
   const adjustmentFactor = Math.max(1 + (15 - playerCount) / 20, 0.10);
-  console.log(
+  logger.log(
     `Elo Threshold: ${baseThreshold} * ${adjustmentFactor} = ${
       baseThreshold * adjustmentFactor
     }`

@@ -3,6 +3,7 @@ import * as matchmaking from "../../matchmaking/index.js";
 import { getWinningPlayers, resetWinHistory, setWinner } from "../../caches.js";
 //@ts-ignore
 import Sortable, { Swap } from 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/modular/sortable.core.esm.js'
+import { logger } from "../../logger.js";
 
 
 Sortable.mount(new Swap());
@@ -32,8 +33,7 @@ const teamNames = [
  */
 const matchList = [];
 
-if(location.hostname !== "localhost")
-{
+if (location.hostname !== "localhost") {
     document.querySelector('.player_count').style.display = 'none';
 }
 /**
@@ -64,7 +64,7 @@ function getTeams100(teams) {
         selectedTeams: teams,
         get removedPlayers() {
             const players = teams.flatMap(x => x.players)
-            console.log(players.length)
+            logger.log(players.length)
             const skipped = playerCache.filter(x => x.isActive && !players.some(player => player.name === x.name));
             return skipped
         }
@@ -90,9 +90,9 @@ let matches = [];
 const firstFuncToCall = {
     "swiss": () => {
         teams = matchmaking.generateSwissTeams();
-        console.log(teams)
+        logger.log(teams)
         matches = matchmaking.generateSwissMatches(convertTeams(teams.selectedTeams));
-        console.log(matches)
+        logger.log(matches)
         return matches.pop();
     },
     "salad100": () => {
@@ -112,7 +112,7 @@ const nextMatches = {
 const regenTeams = {
     "swiss": () => {
         teams = matchmaking.generateSwissTeams();
-        console.log(teams)
+        logger.log(teams)
         matches = matchmaking.generateSwissMatches(convertTeams(teams.selectedTeams));
         return matches.pop();
     },
@@ -184,15 +184,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     next_button.addEventListener('click', () => {
-        if(matchList.some(m => m.teamAScore == 0 && m.teamBScore == 0)) {
+        if (matchList.some(m => m.teamAScore == 0 && m.teamBScore == 0)) {
             alert("Please enter scores for all matches before proceeding to the next round.");
             return;
         }
 
         const matchHistory = JSON.parse(sessionStorage.getItem("scoreHistory")) || [];
-        matchHistory.push(matchList.map(({match, teamAScore, teamBScore}) => ({ match, teamAScore, teamBScore })));
+        matchHistory.push(matchList.map(({ match, teamAScore, teamBScore }) => ({ match, teamAScore, teamBScore })));
         sessionStorage.setItem("scoreHistory", JSON.stringify(matchHistory));
-        
+
         for (const { match, teamAScore, teamBScore } of matchList) {
             setWinner(match, teamAScore > teamBScore ? match.teamA : match.teamB);
         }
@@ -320,12 +320,22 @@ function createTeam(team, matchIndex, teamSide) {
         playerList.appendChild(playerElement);
     });
     function replaceDraggedElement(draggedElement) {
-        // Dragged element can be a player entry or a skipped player entry
-        const playerName = draggedElement.getAttribute('data-id');
-        const player = playerCache.find(p => p.name === playerName);
-        const playerElement = createPlayerEntry(player);
-        setTimeout(() => 
-        draggedElement.replaceWith(playerElement), 150)
+        return new Promise((resolve, reject) => {
+
+            // Dragged element can be a player entry or a skipped player entry
+            const playerName = draggedElement.getAttribute('data-id');
+            const player = playerCache.find(p => p.name === playerName);
+            const playerElement = createPlayerEntry(player);
+            setTimeout(() =>
+                resolve(draggedElement.replaceWith(playerElement)), 150)
+        })
+    }
+
+    function recreateTeam(element) {
+        const teamPlayerNames = Array.from(element.querySelectorAll('.player_entry')).map(entry => entry.getAttribute('data-id'));
+        const teamPlayers = teamPlayerNames.map(name => playerCache.find(p => p.name === name));
+        team.players = teamPlayers;
+        renderTeamElo(team.players.reduce((acc, player) => acc + player.rank, 0) / 3);
     }
 
     sortables.push(Sortable.create(teamEntry.querySelector('.player_list'), {
@@ -334,19 +344,11 @@ function createTeam(team, matchIndex, teamSide) {
         group: 'shared',
         swap: true,
         onAdd: function (evt) {
-            const teamPlayerNames = Array.from(evt.to.querySelectorAll('.player_entry')).map(entry => entry.getAttribute('data-id'));
-            const teamPlayers = teamPlayerNames.map(name => playerCache.find(p => p.name === name));
-            team.players = teamPlayers;
-            renderTeamElo(team.players.reduce((acc, player) => acc + player.rank, 0) / 3);
-            replaceDraggedElement(evt.item);
+            replaceDraggedElement(evt.item).then(() => recreateTeam(evt.to))
         },
         onRemove: function (evt) {
             const addedElement = playerList.children[evt.oldIndex];
-            replaceDraggedElement(addedElement);
-            const teamPlayerNames = Array.from(evt.from.querySelectorAll('.player_entry')).map(entry => entry.getAttribute('data-id'));
-            const teamPlayers = teamPlayerNames.map(name => playerCache.find(p => p.name === name));
-            team.players = teamPlayers;
-            renderTeamElo(team.players.reduce((acc, player) => acc + player.rank, 0) / 3);
+            replaceDraggedElement(addedElement).then(() => recreateTeam(evt.from));
         }
     }));
 
@@ -442,8 +444,8 @@ function createSkippedPlayersEntry(players) {
         const playerName = draggedElement.getAttribute('data-id');
         const player = playerCache.find(p => p.name === playerName);
         const playerElement = createSkippedPlayer(player);
-        setTimeout(() => 
-        draggedElement.replaceWith(playerElement), 150)
+        setTimeout(() =>
+            draggedElement.replaceWith(playerElement), 150)
     }
     sortables.push(Sortable.create(skippedList, {
         animation: 150,

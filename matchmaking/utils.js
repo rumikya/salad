@@ -1,3 +1,4 @@
+import { logger } from "../logger.js";
 import * as Types from "../types.js";
 /**
  *
@@ -15,7 +16,7 @@ export function getTeamElo(team) {
 export function getAllUniqueTeams(players) {
   // Filter to only active players
   const activePlayers = players.filter((p) => p.isActive);
-  console.log(`Active players: ${activePlayers.length}`, activePlayers);
+  logger.log(`Active players: ${activePlayers.length}`, activePlayers);
 
   const teams = [];
   for (let i = 0; i < activePlayers.length - 2; i++) {
@@ -33,7 +34,7 @@ export function getAllUniqueTeams(players) {
     }
   }
 
-  console.log(`Generated ${teams.length} possible teams`);
+  logger.log(`Generated ${teams.length} possible teams`);
 
   return keepValidTeams(teams, activePlayers);
 }

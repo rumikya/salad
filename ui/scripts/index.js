@@ -1,4 +1,5 @@
 import { resetWinHistory, setPlayers } from "../../caches.js";
+import { logger } from "../../logger.js";
 import { eloToRank, databaseRoleToRole, databaseRoleToSortIndex } from "../../models.js";
 // name,role,elo,win,participation,salad_elo
 let players = [];
@@ -181,7 +182,7 @@ function setPlayerSelects() {
     const selects = Array.from(player_entries).map(entry => entry.querySelector("#player_select"));
     const selectedNames = selects.map(select => select.value);
     const availableNames = new Set(players.map(player => player.name).filter(name => !selectedNames.includes(name)));
-    console.log(availableNames)
+    logger.log(availableNames)
     selects.forEach(select => {
         setPlayerSelect(select, availableNames);
     })
@@ -241,7 +242,7 @@ function updatePlayerList() {
 document.getElementsByName("elo").forEach(radio => {
     radio.addEventListener("change", function() {
         eloMode = this.value;
-        console.log(eloMode)
+        logger.log(eloMode)
         sessionStorage.setItem('eloMode', eloMode);
         document.querySelectorAll(".player_entry").forEach(entry => {
             playerRoleChanged(entry);

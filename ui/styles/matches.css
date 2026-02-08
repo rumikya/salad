@@ -8,14 +8,15 @@
 
 }
 
-html, body {
+html,
+body {
     width: 100%;
     height: 100%;
 }
 
 .main {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     justify-content: space-between;
     height: 100%;
     width: 100%;
@@ -39,7 +40,7 @@ html, body {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 3em;
+    gap: 4em;
     justify-content: center;
     align-items: center;
     height: 100%;
@@ -64,11 +65,13 @@ html, body {
     height: 325px;
 }
 
-.team_name, .skipped_player_text {
+.team_name,
+.skipped_player_text {
     width: 100%;
 }
 
-.average_rank, .average_rank_elo {
+.average_rank,
+.average_rank_elo {
     margin-top: 5px;
 }
 
@@ -76,7 +79,8 @@ html, body {
     margin-top: 10px;
 }
 
-.average_rank_text, .player_entry {
+.average_rank_text,
+.player_entry {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -84,23 +88,34 @@ html, body {
     width: 100%;
 }
 
-.player_name, .average_rank_text {
+.player_name,
+.average_rank_text {
     text-align: left;
 }
 
 .player_entry {
-    width: 200px;
+    width: 100%;
 }
 
 .player_name {
-    width: 140px;
+    white-space: nowrap; 
+}
+
+.player_name {
+    max-width: 200px;
+    overflow: hidden;
+}
+
+.player_role {
+    white-space: nowrap;      /* prevent line breaks */
 }
 
 .average_rank_elo {
     width: 105px;
 }
 
-.average_rank_icon, .player_rank {
+.average_rank_icon,
+.player_rank {
     width: 32px;
     margin-left: 5px;
 }
@@ -110,7 +125,7 @@ html, body {
 }
 
 .team_background {
-    width: 100%;
+    width: 198px;
     margin-top: -100px;
     max-height: 192px;
 }
@@ -130,12 +145,14 @@ html, body {
     flex-direction: column;
     overflow-y: scroll;
 }
+
 .buttons_container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     grid-template-columns: 1fr;
 }
+
 .action_button {
     background: none;
     border: none;
@@ -143,12 +160,14 @@ html, body {
     padding: 10px;
     margin: 10px;
 }
+
 .matches_container {
     width: 100%;
     margin-top: 20px;
     display: flex;
     flex-direction: column;
 }
+
 .match_entry {
     display: flex;
     flex-direction: column;
@@ -163,6 +182,7 @@ html, body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 
 }
+
 .match_teams {
     display: flex;
     flex-direction: row;
@@ -172,13 +192,15 @@ html, body {
     margin-bottom: 12px;
     margin-top: 12px;
 }
+
 .match_team_logo {
     width: 60px;
     height: 60px;
     object-fit: contain;
     margin: 0 8px;
 }
-.match_score{
+
+.match_score {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -186,7 +208,9 @@ html, body {
     font-size: 24px;
     font-weight: bold;
 }
-input.team1_score, input.team2_score {
+
+input.team1_score,
+input.team2_score {
     width: 122px;
     font-size: 24px;
     font-weight: bold;
@@ -205,6 +229,7 @@ input.team2_score {
 ::backdrop {
     background: rgba(0, 0, 0, 0.5);
 }
+
 #result_modal {
     border: none;
     border-radius: 10px;
@@ -217,6 +242,7 @@ input.team2_score {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
 #close_result_modal {
     position: absolute;
     top: 10px;
@@ -224,11 +250,13 @@ input.team2_score {
     font-size: 24px;
     cursor: pointer;
 }
+
 #results_container {
     margin-top: 30px;
     max-height: 400px;
     overflow-y: auto;
 }
+
 .winner_entry {
     display: flex;
     flex-direction: row;
@@ -237,7 +265,8 @@ input.team2_score {
     margin-bottom: 10px;
 }
 
-.team1, .team2 {
+.team1,
+.team2 {
     width: 130px;
 }
 
