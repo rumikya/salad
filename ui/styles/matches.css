@@ -102,7 +102,7 @@ body {
 }
 
 .player_name {
-    max-width: 200px;
+    width: 140px;
     overflow: hidden;
 }
 
